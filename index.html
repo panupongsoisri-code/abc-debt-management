@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthDebt | เครื่องมือวิเคราะห์สุขภาพการเงิน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Brand — Money Thunder / Abacus Digital indigo-blue palette */
+      --primary:        #3535C8;
+      --primary-dark:   #2828A8;
+      --primary-light:  #eeeeff;
+      --primary-mid:    #7474c1;
+      --success:        #00778b;
+      --success-light:  #00b2a9;
+      --success-bg:     #e8f7f8;
+      --success-border: #00b2a9;
+      --warning:        #f86b0f;
+      --warning-bg:     #fff4ec;
+      --warning-border: #f86b0f;
+      --danger:         #ec1e35;
+      --danger-bg:      #fef0f2;
+      --danger-border:  #f8a0aa;
+      /* Neutral grays — derived from design token aaartboard.gray */
+      --gray-50:  #f5f5f8;
+      --gray-100: #ededf2;
+      --gray-200: #dddde6;
+      --gray-300: #c8c8d4;
+      --gray-400: #9494a8;
+      --gray-500: #6b6b80;
+      --gray-600: #4a4a5e;
+      --gray-700: #32324a;
+      --gray-800: #1e1e36;
+      --gray-900: #121220;
+      --white:    #ffffff;
+      --radius:    16px;
+      --radius-sm: 12px;
+      --radius-pill: 50px;
+      /* Shadows from design tokens effect.elevation */
+      --shadow:    0 2px 4px rgba(18,18,64,.08);
+      --shadow-md: 0 8px 16px rgba(18,18,64,.06);
+      --shadow-float: 0 2px 4px rgba(222,222,227,.56);
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ───── Header ───── */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 14px 20px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .header-inner { max-width: 920px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+    .logo {
+      width: 42px; height: 42px;
+      background: var(--primary);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(53,53,200,.35);
+    }
+    .header-title    { font-size: 18px; font-weight: 600; color: var(--gray-900); letter-spacing: -0.2px; }
+    .header-subtitle { font-size: 12px; color: var(--gray-500); font-weight: 300; }
+
+    /* ───── Container ───── */
+    .container { max-width: 920px; margin: 0 auto; padding: 28px 16px 56px; }
+
+    /* ───── Progress Steps ───── */
+    .progress-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+    .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; min-width: 0; }
+    .step-item:not(:last-child)::after {
+      content: ''; position: absolute; top: 17px; left: 60%;
+      width: 80%; height: 2px;
+      background: var(--gray-200); z-index: 0; transition: background .3s;
+      border-radius: 2px;
+    }
+    .step-item.completed:not(:last-child)::after { background: var(--primary); }
+    .step-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--gray-100); color: var(--gray-400);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 14px; position: relative; z-index: 1;
+      transition: all .3s; border: 2px solid var(--gray-200);
+    }
+    .step-item.active    .step-circle {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+      box-shadow: 0 0 0 5px rgba(53,53,200,.15);
+    }
+    .step-item.completed .step-circle { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .step-label { font-size: 11px; color: var(--gray-400); margin-top: 5px; white-space: nowrap; font-weight: 400; }
+    .step-item.active    .step-label { color: var(--primary); font-weight: 600; }
+    .step-item.completed .step-label { color: var(--primary); }
+
+    /* ───── Cards ───── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-float);
+      border: 1px solid var(--gray-100);
+      margin-bottom: 16px; overflow: hidden;
+    }
+    .card-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 12px; }
+    .card-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .card-icon.blue   { background: rgba(53,143,233,.12); }
+    .card-icon.green  { background: rgba(0,178,169,.12); }
+    .card-icon.orange { background: rgba(248,107,15,.12); }
+    .card-icon.purple { background: rgba(53,53,200,.12); }
+    .card-icon.red    { background: rgba(236,30,53,.12); }
+    .card-icon.gray   { background: var(--gray-100); }
+    .card-title { font-size: 16px; font-weight: 500; color: var(--gray-900); }
+    .card-desc  { font-size: 13px; color: var(--gray-500); margin-top: 2px; font-weight: 300; }
+    .card-body  { padding: 18px 20px; }
+
+    /* ───── Entry Blocks ───── */
+    .entry-block {
+      background: var(--gray-50); border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px;
+    }
+    .entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .entry-label { font-size: 14px; font-weight: 500; color: var(--gray-700); }
+    .btn-remove {
+      background: var(--danger-bg); color: var(--danger);
+      border: 1px solid var(--danger-border); border-radius: 8px;
+      padding: 4px 10px; font-size: 12px; font-family: 'Kanit', sans-serif;
+      cursor: pointer; font-weight: 500; transition: all .2s;
+    }
+    .btn-remove:hover { background: var(--danger); color: #fff; }
+
+    /* ───── Form Grid ───── */
+    .form-grid   { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .form-group  { display: flex; flex-direction: column; gap: 5px; }
+    .form-full   { grid-column: 1/-1; }
+    label        { font-size: 13px; font-weight: 300; color: var(--gray-600); }
+    label .req   { color: var(--danger); margin-left: 2px; }
+    label .opt   { color: var(--gray-400); font-weight: 300; font-size: 12px; margin-left: 4px; }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+      font-size: 15px; font-family: 'Kanit', sans-serif; color: var(--gray-900); font-weight: 300;
+      background: var(--white); transition: border-color .2s, box-shadow .2s; width: 100%; -webkit-appearance: none;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(53,53,200,.12); }
+    .input-wrap      { position: relative; }
+    .input-wrap input{ padding-right: 56px; }
+    .input-unit      { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: var(--gray-500); font-size: 12px; font-weight: 600; pointer-events: none; white-space: nowrap; }
+
+    /* ───── Toggle ───── */
+    .toggle-group { display: flex; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); overflow: hidden; background: var(--gray-50); }
+    .toggle-group input[type="radio"] { display: none; }
+    .toggle-group label { flex: 1; text-align: center; padding: 9px 10px; font-size: 13px; font-weight: 400; color: var(--gray-500); border-right: 1px solid var(--gray-200); cursor: pointer; transition: all .2s; }
+    .toggle-group label:last-child { border-right: none; }
+    .toggle-group input[type="radio"]:checked + label { background: var(--primary); color: #fff; font-weight: 500; }
+
+    /* ───── Checkbox Card ───── */
+    .check-option {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--danger-bg); border: 1.5px solid var(--danger-border);
+      border-radius: var(--radius-sm); padding: 14px 16px; cursor: pointer;
+    }
+    .check-option input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--danger); flex-shrink: 0; cursor: pointer; }
+    .check-option-text { font-size: 14px; color: #b71c2c; font-weight: 500; }
+    .check-option-sub  { font-size: 12px; color: #c62828; font-weight: 300; margin-top: 2px; }
+
+    /* ───── Buttons ───── */
+    .btn-add {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--primary-light); color: var(--primary);
+      border: 1.5px dashed var(--primary); border-radius: var(--radius-sm);
+      padding: 11px 16px; font-size: 14px; font-weight: 500;
+      font-family: 'Kanit', sans-serif; cursor: pointer; width: 100%;
+      transition: all .2s; margin-top: 4px;
+    }
+    .btn-add:hover { background: var(--primary); color: #fff; border-style: solid; }
+    .btn {
+      padding: 13px 24px; border-radius: var(--radius-pill);
+      font-size: 15px; font-weight: 500; font-family: 'Kanit', sans-serif;
+      cursor: pointer; border: none; display: inline-flex;
+      align-items: center; gap: 8px; transition: all .2s;
+    }
+    .btn-primary   { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(53,53,200,.4); }
+    .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 6px 18px rgba(53,53,200,.5); }
+    .btn-secondary { background: var(--white); color: var(--gray-600); border: 1.5px solid var(--gray-200); border-radius: var(--radius-pill); }
+    .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-300); }
+    .btn-success   { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(53,53,200,.4); }
+    .btn-success:hover { background: var(--primary-dark); }
+    .btn-outline   { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); border-radius: var(--radius-pill); }
+    .btn-outline:hover { background: var(--primary-light); }
+    .btn-ghost     { background: transparent; border: none; color: var(--gray-500); font-size: 14px; cursor: pointer; font-family: 'Kanit', sans-serif; display: flex; align-items: center; gap: 6px; padding: 8px 0; }
+    .btn-ghost:hover { color: var(--gray-700); }
+    .nav-footer    { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; gap: 12px; }
+    .skip-link     { font-size: 13px; color: var(--primary); text-decoration: underline; cursor: pointer; background: none; border: none; font-family: 'Kanit', sans-serif; font-weight: 300; }
+    .skip-link:hover { color: var(--primary-dark); }
+
+    /* ───── Step Heading ───── */
+    .step-heading   { margin-bottom: 22px; }
+    .step-heading h2{ font-size: 22px; font-weight: 500; color: var(--gray-900); margin-bottom: 4px; letter-spacing: -0.3px; }
+    .step-heading p { font-size: 14px; color: var(--gray-500); font-weight: 300; }
+
+    /* ───── Info Boxes ───── */
+    .info-box { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; display: flex; align-items: flex-start; gap: 9px; margin-bottom: 14px; font-weight: 300; }
+    .info-box.blue   { background: rgba(53,143,233,.1); border: 1px solid rgba(53,143,233,.3); color: #1a5fa8; }
+    .info-box.yellow { background: rgba(251,143,35,.08); border: 1px solid rgba(251,143,35,.3); color: #a85d10; }
+    .info-box.red    { background: var(--danger-bg); border: 1px solid var(--danger-border); color: #b71c2c; }
+
+    /* ───── Optional Badge ───── */
+    .opt-badge { display: inline-flex; align-items: center; background: var(--gray-100); color: var(--gray-500); border-radius: 100px; padding: 3px 10px; font-size: 12px; font-weight: 400; margin-left: 8px; }
+
+    /* ═══════════════════════════════════════════════
+       RESULTS STYLES
+    ═══════════════════════════════════════════════ */
+
+    /* Context Banner */
+    .ctx-banner { border-radius: var(--radius); padding: 22px 24px; margin-bottom: 20px; border: 1.5px solid; }
+    .ctx-banner.green  { background: var(--success-bg); border-color: var(--success-border); }
+    .ctx-banner.orange { background: var(--warning-bg); border-color: var(--warning-border); }
+    .ctx-banner.red    { background: var(--danger-bg);  border-color: var(--danger-border); }
+    .ctx-banner.black  { background: #1e1e36; border-color: #32324a; }
+
+    .ctx-top  { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .ctx-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .ctx-banner.green  .ctx-icon { background: rgba(0,178,169,.18); }
+    .ctx-banner.orange .ctx-icon { background: rgba(248,107,15,.15); }
+    .ctx-banner.red    .ctx-icon { background: rgba(236,30,53,.12); }
+    .ctx-banner.black  .ctx-icon { background: rgba(255,255,255,.08); }
+
+    .ctx-title { font-size: 20px; font-weight: 500; }
+    .ctx-banner.green  .ctx-title { color: #005b65; }
+    .ctx-banner.orange .ctx-title { color: #9a3400; }
+    .ctx-banner.red    .ctx-title { color: #b71c2c; }
+    .ctx-banner.black  .ctx-title { color: #f0f0f8; }
+
+    .ctx-sub  { font-size: 13px; margin-top: 3px; font-weight: 300; }
+    .ctx-banner.green  .ctx-sub { color: #00778b; }
+    .ctx-banner.orange .ctx-sub { color: #b84800; }
+    .ctx-banner.red    .ctx-sub { color: #c62828; }
+    .ctx-banner.black  .ctx-sub { color: #9494a8; }
+
+    .ctx-rule { font-size: 13px; font-weight: 500; padding: 8px 12px; border-radius: var(--radius-sm); }
+    .ctx-banner.green  .ctx-rule { background: rgba(0,178,169,.15); color: #005b65; }
+    .ctx-banner.orange .ctx-rule { background: rgba(248,107,15,.12); color: #9a3400; }
+    .ctx-banner.red    .ctx-rule { background: rgba(236,30,53,.1); color: #b71c2c; }
+    .ctx-banner.black  .ctx-rule { background: rgba(255,255,255,.08); color: #d0d0e8; }
+
+    /* NCF Box */
+    .ncf-box { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+    .ncf-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: var(--radius-sm); padding: 14px; text-align: center; box-shadow: var(--shadow); }
+    .ncf-label { font-size: 11px; color: var(--gray-500); font-weight: 400; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+    .ncf-value { font-size: 18px; font-weight: 500; color: var(--gray-900); }
+    .ncf-value.pos { color: var(--success); }
+    .ncf-value.neg { color: var(--danger); }
+    .ncf-value.warn{ color: var(--warning); }
+    .ncf-sub   { font-size: 11px; color: var(--gray-400); margin-top: 3px; font-weight: 300; }
+    .ncf-card.highlight { border-color: var(--primary); background: var(--primary-light); }
+    .ncf-card.highlight .ncf-label { color: var(--primary); }
+
+    /* Progress Bar */
+    .pb-wrap  { margin: 8px 0; }
+    .pb-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 5px; font-weight: 400; }
+    .pb-track { height: 8px; background: var(--gray-100); border-radius: 100px; overflow: hidden; }
+    .pb-fill  { height: 100%; border-radius: 100px; transition: width .6s ease; }
+    .pb-fill.blue   { background: var(--primary); }
+    .pb-fill.green  { background: var(--success-light); }
+    .pb-fill.orange { background: var(--warning); }
+    .pb-fill.red    { background: var(--danger); }
+    .pb-fill.gray   { background: var(--gray-300); }
+
+    /* Priority Badges */
+    .pri-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+    .pri-0 { background: rgba(236,30,53,.12); color: #b71c2c; }
+    .pri-1 { background: rgba(248,107,15,.12); color: #9a3400; }
+    .pri-2 { background: rgba(251,175,23,.15); color: #8a6200; }
+    .pri-3 { background: rgba(53,53,200,.1);   color: var(--primary); }
+
+    /* Action Steps */
+    .action-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .action-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--gray-50); border-radius: var(--radius-sm); border-left: 4px solid var(--primary); }
+    .action-item.green  { border-left-color: var(--success-light); background: rgba(0,178,169,.05); }
+    .action-item.orange { border-left-color: var(--warning);       background: rgba(248,107,15,.05); }
+    .action-item.red    { border-left-color: var(--danger);        background: rgba(236,30,53,.04); }
+    .action-item.black  { border-left-color: var(--gray-700);      background: var(--gray-50); }
+    .action-num  { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+    .action-item.green  .action-num { background: var(--success-light); }
+    .action-item.orange .action-num { background: var(--warning); }
+    .action-item.red    .action-num { background: var(--danger); }
+    .action-item.black  .action-num { background: var(--gray-700); }
+    .action-text { font-size: 14px; color: var(--gray-700); line-height: 1.55; font-weight: 300; }
+    .action-text strong { display: block; font-size: 14px; color: var(--gray-900); margin-bottom: 2px; font-weight: 500; }
+
+    /* Strategy Box (Avalanche/Snowball) */
+    .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .strategy-card { border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); padding: 14px; position: relative; }
+    .strategy-card.recommended { border-color: var(--success-light); background: rgba(0,178,169,.05); }
+    .strategy-badge { position: absolute; top: -10px; right: 12px; background: var(--success-light); color: #fff; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
+    .strategy-title { font-size: 15px; font-weight: 500; color: var(--gray-900); margin-bottom: 4px; }
+    .strategy-target{ font-size: 13px; color: var(--gray-600); font-weight: 300; }
+    .strategy-target strong { color: var(--primary); font-weight: 500; }
+    .strategy-note  { font-size: 12px; color: var(--gray-500); margin-top: 6px; font-weight: 300; }
+
+    /* Tables */
+    .table-wrap  { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--gray-100); }
+    .data-table  { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th { text-align: left; padding: 9px 12px; background: var(--gray-50); color: var(--gray-500); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); font-weight: 300; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .amt { text-align: right; font-weight: 500; color: var(--gray-900); }
+    .data-table tr.pri-highlight-0 { background: rgba(236,30,53,.04); }
+    .data-table tr.pri-highlight-1 { background: rgba(248,107,15,.04); }
+    .data-table tr.pri-highlight-2 { background: rgba(251,175,23,.04); }
+    .data-table tr.pri-highlight-3 { background: rgba(53,53,200,.03); }
+
+    /* Badges */
+    .badge          { display: inline-flex; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+    .badge-fixed    { background: rgba(53,53,200,.1); color: var(--primary); }
+    .badge-variable { background: rgba(0,178,169,.12); color: var(--success); }
+    .badge-type     { background: var(--gray-100); color: var(--gray-600); }
+
+    /* Net Worth row */
+    .nw-row   { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--primary-light); border-radius: var(--radius-sm); margin-top: 12px; }
+    .nw-label { font-size: 14px; font-weight: 500; color: var(--primary-dark); }
+    .nw-value { font-size: 22px; font-weight: 500; }
+    hr.divider{ border: none; border-top: 1px solid var(--gray-100); margin: 14px 0; }
+
+    /* Step Visibility */
+    .step-content        { display: none; }
+    .step-content.active { display: block; animation: fadeUp .25s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Footer */
+    .page-footer { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--gray-100); font-weight: 300; }
+
+    /* Print */
+    @media print {
+      .header, .progress-steps, .nav-footer, .page-footer { display: none !important; }
+      .container { padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       SPLASH / HOME PAGE
+    ═══════════════════════════════════════════════ */
+    .splash {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--primary);
+      display: flex; flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    .splash.hidden {
+      opacity: 0; pointer-events: none; transform: translateY(-16px);
+    }
+
+    /* Close button */
+    .splash-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,.22); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .2s;
+      backdrop-filter: blur(4px);
+    }
+    .splash-close:hover { background: rgba(255,255,255,.35); }
+    .splash-close svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+
+    /* Text block */
+    .splash-text {
+      text-align: center; color: #fff;
+      padding: 72px 32px 0;
+      flex-shrink: 0;
+    }
+    .splash-heading {
+      font-size: 32px; font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.5px; margin-bottom: 14px;
+    }
+    .splash-sub {
+      font-size: 16px; font-weight: 400;
+      opacity: .88; line-height: 1.5;
+    }
+
+    /* Illustration */
+    .splash-illo {
+      flex: 1; width: 100%; position: relative;
+      display: flex; align-items: flex-end; justify-content: center;
+      overflow: hidden; min-height: 0;
+    }
+    .splash-illo svg {
+      width: 100%; max-width: 420px;
+      height: auto; display: block;
+    }
+
+    /* Confetti dots */
+    .confetti { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    .confetti circle, .confetti rect { opacity: .85; }
+
+    /* CTA button */
+    .splash-cta-wrap {
+      width: 100%; padding: 20px 24px 36px;
+      flex-shrink: 0;
+    }
+    .splash-cta {
+      width: 100%; padding: 16px 24px;
+      background: #fff; color: var(--primary);
+      border: none; border-radius: var(--radius-pill);
+      font-size: 17px; font-weight: 600;
+      font-family: 'Kanit', sans-serif;
+      cursor: pointer; transition: all .2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    }
+    .splash-cta:hover { background: #eeeeff; transform: translateY(-1px); }
+    .splash-cta:active { transform: translateY(0); }
+
+    /* Tablet */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .form-grid-3 { grid-template-columns: repeat(2,1fr); }
+      .ncf-box { grid-template-columns: repeat(2,1fr); }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .container { padding: 16px 14px 48px; }
+      .card-header { padding: 14px 16px 12px; }
+      .card-body   { padding: 14px 16px; }
+      .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+      .ncf-box     { grid-template-columns: repeat(2,1fr); }
+      .strategy-grid { grid-template-columns: 1fr; }
+      .ctx-banner  { padding: 16px; }
+      .ctx-top     { flex-direction: column; text-align: center; }
+      .nav-footer  { flex-direction: column-reverse; gap: 10px; }
+      .nav-footer .btn { width: 100%; justify-content: center; padding: 14px 24px; font-size: 16px; }
+      .nav-footer .btn-secondary { order: 2; }
+      .step-label  { display: none; }
+      .header-subtitle { display: none; }
+      .data-table  { font-size: 12px; }
+      .data-table th, .data-table td { padding: 8px; }
+    }
+    @media (max-width: 480px) {
+      .step-circle { width: 30px; height: 30px; font-size: 13px; }
+      .step-item:not(:last-child)::after { top: 15px; }
+      .header-title { font-size: 17px; }
+      .ncf-box { grid-template-columns: 1fr 1fr; }
+      .step-heading h2 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SPLASH / HOME PAGE ═══ -->
+<div class="splash" id="splash">
+
+  <!-- Close button -->
+  <button class="splash-close" onclick="dismissSplash()" aria-label="ปิด">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <!-- Text -->
+  <div class="splash-text">
+    <div class="splash-heading">ปลดหนี้ได้<br>ถ้าใจสู้และรู้วิธี</div>
+    <div class="splash-sub">ก้าวสู่หนทางปลดหนี้ไปด้วยกัน</div>
+  </div>
+
+  <!-- Illustration -->
+  <div class="splash-illo">
+
+    <!-- Confetti layer -->
+    <svg class="confetti" viewBox="0 0 375 500" preserveAspectRatio="xMidYMid slice">
+      <!-- scattered confetti shapes -->
+      <rect x="60"  y="40"  width="10" height="14" rx="2" fill="#FCAF17" transform="rotate(20 65 47)"/>
+      <rect x="290" y="30"  width="10" height="14" rx="2" fill="#00B2A9" transform="rotate(-15 295 37)"/>
+      <rect x="140" y="20"  width="8"  height="12" rx="2" fill="#ec1e35" transform="rotate(35 144 26)"/>
+      <rect x="220" y="55"  width="8"  height="12" rx="2" fill="#00B2A9" transform="rotate(-30 224 61)"/>
+      <rect x="320" y="80"  width="9"  height="13" rx="2" fill="#FCAF17" transform="rotate(10 324 86)"/>
+      <rect x="40"  y="110" width="9"  height="13" rx="2" fill="#ec1e35" transform="rotate(-25 44 116)"/>
+      <circle cx="170" cy="35"  r="6" fill="#FCAF17"/>
+      <circle cx="310" cy="120" r="5" fill="#ec1e35"/>
+      <circle cx="55"  cy="75"  r="5" fill="#00B2A9"/>
+      <circle cx="260" cy="25"  r="4" fill="#7474c1"/>
+      <rect x="100" y="90"  width="7"  height="11" rx="1.5" fill="#7474c1" transform="rotate(45 103 95)"/>
+      <rect x="340" y="50"  width="7"  height="11" rx="1.5" fill="#ec1e35" transform="rotate(-40 343 55)"/>
+      <circle cx="195" cy="80"  r="4" fill="#00B2A9"/>
+      <rect x="240" y="100" width="8"  height="12" rx="2" fill="#FCAF17" transform="rotate(15 244 106)"/>
+    </svg>
+
+    <!-- Two people celebrating SVG illustration -->
+    <svg viewBox="0 0 320 380" xmlns="http://www.w3.org/2000/svg">
+      <!-- ── Person LEFT (man) ── -->
+      <!-- Body / shirt (dark blue) -->
+      <rect x="68" y="175" width="68" height="90" rx="10" fill="#2828A8"/>
+      <!-- Collar white -->
+      <polygon points="102,175 88,198 102,192 116,198" fill="#fff"/>
+      <!-- Left arm raised up-left -->
+      <line x1="68" y1="190" x2="30" y2="130" stroke="#2828A8" stroke-width="22" stroke-linecap="round"/>
+      <!-- Fist left -->
+      <ellipse cx="28" cy="122" rx="13" ry="11" fill="#f5c5a3"/>
+      <!-- Right arm down -->
+      <line x1="136" y1="195" x2="155" y2="240" stroke="#2828A8" stroke-width="22" stroke-linecap="round"/>
+      <!-- Hand right -->
+      <ellipse cx="157" cy="248" rx="12" ry="10" fill="#f5c5a3"/>
+      <!-- Pants (dark navy) -->
+      <rect x="68" y="262" width="30" height="90" rx="8" fill="#1e1e5e"/>
+      <rect x="100" y="262" width="30" height="90" rx="8" fill="#1e1e5e"/>
+      <!-- Neck -->
+      <rect x="94" y="152" width="18" height="28" rx="6" fill="#f5c5a3"/>
+      <!-- Head -->
+      <ellipse cx="103" cy="135" rx="28" ry="28" fill="#f5c5a3"/>
+      <!-- Hair -->
+      <ellipse cx="103" cy="110" rx="28" ry="14" fill="#1a1a2e"/>
+      <rect x="75" y="108" width="56" height="12" rx="6" fill="#1a1a2e"/>
+      <!-- Eyes -->
+      <ellipse cx="94"  cy="132" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <ellipse cx="112" cy="132" rx="4" ry="4.5" fill="#1a1a2e"/>
+      <!-- Smile -->
+      <path d="M92 144 Q103 154 114 144" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cheeks -->
+      <ellipse cx="87"  cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
+      <ellipse cx="119" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
+      <!-- Watch -->
+      <rect x="148" y="243" width="16" height="10" rx="3" fill="#555"/>
+
+      <!-- ── Person RIGHT (woman) ── -->
+      <!-- Body / blouse (white) -->
+      <rect x="184" y="175" width="68" height="85" rx="10" fill="#ffffff"/>
+      <!-- Collar detail -->
+      <polygon points="218,175 204,196 218,188 232,196" fill="#dde3ff"/>
+      <!-- Buttons -->
+      <circle cx="218" cy="205" r="3.5" fill="#3535C8"/>
+      <circle cx="218" cy="218" r="3.5" fill="#3535C8"/>
+      <!-- Stripe sleeves -->
+      <rect x="184" y="205" width="68" height="5" rx="2" fill="#dde3ff"/>
+      <rect x="184" y="214" width="68" height="5" rx="2" fill="#dde3ff"/>
+      <!-- Left arm down -->
+      <line x1="184" y1="195" x2="165" y2="240" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+      <!-- Hand left -->
+      <ellipse cx="163" cy="248" rx="12" ry="10" fill="#f5c5a3"/>
+      <!-- Right arm raised up-right -->
+      <line x1="252" y1="190" x2="292" y2="128" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+      <!-- Fist right -->
+      <ellipse cx="294" cy="120" rx="13" ry="11" fill="#f5c5a3"/>
+      <!-- Pants / skirt (dark navy) -->
+      <rect x="184" y="258" width="68" height="8"  rx="4" fill="#b0b8e8"/>
+      <rect x="184" y="264" width="32" height="88" rx="8" fill="#1e1e5e"/>
+      <rect x="218" y="264" width="32" height="88" rx="8" fill="#1e1e5e"/>
+      <!-- Neck -->
+      <rect x="210" y="152" width="18" height="28" rx="6" fill="#f5c5a3"/>
+      <!-- Head -->
+      <ellipse cx="219" cy="135" rx="28" ry="28" fill="#f5c5a3"/>
+      <!-- Hair (long, dark) -->
+      <ellipse cx="219" cy="110" rx="29" ry="14" fill="#1a1a2e"/>
+      <rect x="191" y="108" width="18" height="52" rx="8" fill="#1a1a2e"/>
+      <rect x="247" y="108" width="18" height="52" rx="8" fill="#1a1a2e"/>
+      <rect x="191" y="108" width="57" height="14" rx="6" fill="#1a1a2e"/>
+      <!-- Eyes (closed — happy) -->
+      <path d="M209 132 Q213 128 217 132" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M221 132 Q225 128 229 132" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Smile -->
+      <path d="M207 144 Q219 156 231 144" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cheeks -->
+      <ellipse cx="203" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
+      <ellipse cx="235" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
+
+      <!-- Shared podium / ground platform -->
+      <rect x="50" y="348" width="222" height="32" rx="10" fill="rgba(255,255,255,.18)"/>
+      <rect x="110" y="330" width="102" height="22" rx="6" fill="rgba(255,255,255,.12)"/>
+    </svg>
+  </div>
+
+  <!-- CTA -->
+  <div class="splash-cta-wrap">
+    <button class="splash-cta" onclick="dismissSplash()">เริ่มต้นปลดหนี้</button>
+  </div>
+
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">⚡</div>
+    <div>
+      <div class="header-title">HealthDebt</div>
+      <div class="header-subtitle">เครื่องมือวิเคราะห์สุขภาพการเงินส่วนบุคคล</div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Progress Steps -->
+  <div class="progress-steps">
+    <div class="step-item active" id="snav-1"><div class="step-circle">1</div><div class="step-label">รายได้</div></div>
+    <div class="step-item" id="snav-2"><div class="step-circle">2</div><div class="step-label">ภาระหนี้</div></div>
+    <div class="step-item" id="snav-3"><div class="step-circle">3</div><div class="step-label">ค่าใช้จ่าย</div></div>
+    <div class="step-item" id="snav-4"><div class="step-circle">4</div><div class="step-label">ทรัพย์สิน</div></div>
+    <div class="step-item" id="snav-5"><div class="step-circle">5</div><div class="step-label">ผลวิเคราะห์</div></div>
+  </div>
+
+  <!-- ═══ STEP 1 : รายได้ ═══ -->
+  <div class="step-content active" id="step-1">
+    <div class="step-heading">
+      <h2>💼 รายได้ของคุณ</h2>
+      <p>กรอกรายได้ทั้งหมดที่ได้รับต่อเดือน สามารถเพิ่มได้มากกว่า 1 แหล่งที่มา</p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">💼</div>
+        <div><div class="card-title">แหล่งรายได้</div><div class="card-desc">เงินเดือน ธุรกิจ ค่าเช่า ฟรีแลนซ์ ฯลฯ</div></div>
+      </div>
+      <div class="card-body">
+        <div id="income-list"></div>
+        <button class="btn-add" onclick="addIncome()">＋ เพิ่มแหล่งรายได้</button>
+        <div id="income-total-row" style="display:none; margin-top:14px; padding:12px 16px; background:var(--primary-light); border:1.5px solid rgba(53,53,200,.2); border-radius:12px; display:none; align-items:center; justify-content:space-between;">
+          <span style="font-size:14px; font-weight:500; color:var(--primary);">รายได้รวมทั้งหมด</span>
+          <span id="income-total-value" style="font-size:22px; font-weight:500; color:var(--primary-dark);">฿0</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextStep(1)">ถัดไป &rarr; ภาระหนี้</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2 : ภาระหนี้ ═══ -->
+  <div class="step-content" id="step-2">
+    <div class="step-heading">
+      <h2>🏦 ภาระหนี้สิน</h2>
+      <p>กรอกข้อมูลหนี้สินทั้งหมดที่มีอยู่ในปัจจุบัน</p>
+    </div>
+
+    <div class="info-box blue">
+      <span>ℹ️</span>
+      <span>กรอกหนี้ทุกประเภท — บัตรเครดิต สินเชื่อบ้าน สินเชื่อรถ หนี้นอกระบบ ฯลฯ ระบบจะจัดลำดับความสำคัญให้อัตโนมัติตาม Algorithm</span>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">🏦</div>
+        <div><div class="card-title">รายการหนี้สิน</div><div class="card-desc">ระบบจะจัดลำดับ Priority 0–3 ให้อัตโนมัติตามประเภทหนี้</div></div>
+      </div>
+      <div class="card-body">
+        <div id="debt-list"></div>
+        <button class="btn-add" onclick="addDebt()">＋ เพิ่มรายการหนี้</button>
+        <div id="debt-total-row" style="display:none; margin-top:14px; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:180px; padding:12px 16px; background:var(--primary-light); border:1.5px solid rgba(53,53,200,.2); border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:13px; font-weight:500; color:var(--primary);">ยอดผ่อนรวม / เดือน</span>
+            <span id="debt-total-monthly" style="font-size:20px; font-weight:500; color:var(--primary-dark);">฿0</span>
+          </div>
+          <div style="flex:1; min-width:180px; padding:12px 16px; background:var(--danger-bg); border:1.5px solid var(--danger-border); border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:13px; font-weight:500; color:#b71c2c;">ยอดหนี้คงเหลือรวม</span>
+            <span id="debt-total-balance" style="font-size:20px; font-weight:500; color:var(--danger);">฿0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context D trigger -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon red">⚫</div>
+        <div><div class="card-title">สถานะการทวงถาม</div><div class="card-desc">สำหรับเลือก Context ที่เหมาะสมในการวิเคราะห์</div></div>
+      </div>
+      <div class="card-body">
+        <label class="check-option">
+          <input type="checkbox" id="chk-collection">
+          <div>
+            <div class="check-option-text">⚫ ขณะนี้ถูกทวงถาม หรืออยู่ระหว่างกระบวนการฟ้องร้อง</div>
+            <div class="check-option-sub">เจ้าหนี้ติดต่อมาเป็นประจำ หรือได้รับหมายศาลแล้ว</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="btn btn-secondary" onclick="prevStep(2)">&larr; ย้อนกลับ</button>
+      <button class="btn btn-primary" onclick="nextStep(2)">ถัดไป &rarr; ค่าใช้จ่าย</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3 : ค่าใช้จ่าย ═══ -->
+  <div class="step-content" id="step-3">
+    <div class="step-heading">
+      <h2>🛒 ค่าใช้จ่ายในการดำรงชีวิต</h2>
+      <p>กรอก Living Expenses — ค่าใช้จ่ายที่จำเป็นต่อชีวิต <strong>ไม่รวม</strong>ยอดผ่อนหนี้</p>
+    </div>
+    <div class="info-box yellow">
+      <span>💡</span>
+      <span>Algorithm ใช้ตัวเลขนี้เป็น <strong>Living_Expenses</strong> เพื่อคำนวณ NCF = รายได้ − ค่าครองชีพ − ยอดผ่อนหนี้ทั้งหมด</span>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon orange">🛒</div>
+        <div><div class="card-title">รายการค่าใช้จ่าย</div><div class="card-desc">ไม่รวมยอดผ่อนหนี้ที่กรอกในขั้นตอนที่ 2</div></div>
+      </div>
+      <div class="card-body">
+        <div id="expense-list"></div>
+        <button class="btn-add" onclick="addExpense()">＋ เพิ่มค่าใช้จ่าย</button>
+        <div id="expense-total-row" style="display:none; margin-top:14px; padding:12px 16px; background:rgba(248,107,15,.08); border:1.5px solid rgba(248,107,15,.3); border-radius:12px; display:none; align-items:center; justify-content:space-between;">
+          <span style="font-size:14px; font-weight:500; color:#9a3400;">ค่าใช้จ่ายรวม / เดือน</span>
+          <span id="expense-total-value" style="font-size:22px; font-weight:500; color:var(--warning);">฿0</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="btn btn-secondary" onclick="prevStep(3)">&larr; ย้อนกลับ</button>
+      <button class="btn btn-primary" onclick="nextStep(3)">ถัดไป &rarr; ทรัพย์สิน</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 4 : ทรัพย์สิน (Optional) ═══ -->
+  <div class="step-content" id="step-4">
+    <div class="step-heading">
+      <h2>🏠 ทรัพย์สินและเงินออม <span class="opt-badge">ไม่บังคับ</span></h2>
+      <p>ข้อมูลส่วนนี้ใช้คำนวณ Net Worth และ Haircut Fund ในกรณีที่จำเป็น</p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">💰</div>
+        <div><div class="card-title">เงินออมและสภาพคล่อง</div><div class="card-desc">เงินสด บัญชีออมทรัพย์ และการออมต่อเดือน</div></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>เงินในบัญชีออมทรัพย์ / เงินสด <span class="opt">(฿)</span></label>
+            <div class="input-wrap"><input type="text" inputmode="numeric" id="sav-balance" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿</span></div>
+          </div>
+          <div class="form-group">
+            <label>เงินออมต่อเดือน <span class="opt">(฿/เดือน)</span></label>
+            <div class="input-wrap"><input type="text" inputmode="numeric" id="sav-monthly" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿/ด.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">🏠</div>
+        <div><div class="card-title">ทรัพย์สินอื่นๆ <span class="opt-badge">ไม่บังคับ</span></div><div class="card-desc">อสังหาริมทรัพย์ รถยนต์ หุ้น กองทุน</div></div>
+      </div>
+      <div class="card-body">
+        <div id="asset-list"></div>
+        <button class="btn-add" onclick="addAsset()">＋ เพิ่มทรัพย์สิน</button>
+        <div id="asset-total-row" style="display:none; margin-top:14px; padding:12px 16px; background:rgba(0,178,169,.08); border:1.5px solid rgba(0,178,169,.3); border-radius:12px; display:none; align-items:center; justify-content:space-between;">
+          <span style="font-size:14px; font-weight:500; color:#005b65;">มูลค่าทรัพย์สินรวม</span>
+          <span id="asset-total-value" style="font-size:22px; font-weight:500; color:var(--success);">฿0</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="btn btn-secondary" onclick="prevStep(4)">&larr; ย้อนกลับ</button>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="skip-link" onclick="doAnalyze()">ข้ามและวิเคราะห์</button>
+        <button class="btn btn-success" onclick="doAnalyze()">🔍 วิเคราะห์การเงิน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 5 : ผลการวิเคราะห์ ═══ -->
+  <div class="step-content" id="step-5">
+    <div class="step-heading">
+      <h2>📊 ผลการวิเคราะห์สุขภาพการเงิน</h2>
+      <p>วิเคราะห์ตาม Debt Management Algorithm — NCF Routing + Debt Priority</p>
+    </div>
+    <div id="results-content"></div>
+    <div class="nav-footer" style="margin-top:28px;">
+      <button class="btn-ghost" onclick="doRestart()">↺ เริ่มต้นใหม่</button>
+      <button class="btn btn-outline" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="page-footer container">
+  HealthDebt &bull; ประมวลผลในเบราว์เซอร์ทั้งหมด ข้อมูลไม่ถูกส่งออกภายนอก
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPT — Debt Management Algorithm
+═══════════════════════════════════════════════════════════ -->
+<script>
+  /* ── Splash screen ── */
+  function dismissSplash() {
+    const s = document.getElementById('splash');
+    s.classList.add('hidden');
+    setTimeout(() => { s.style.display = 'none'; }, 420);
+  }
+  /* ──────────────────────────────────────────
+     CONSTANTS — Debt Priority Mapping
+     Algorithm [3]: จัดลำดับความสำคัญของหนี้
+  ────────────────────────────────────────── */
+  // Algorithm [3]: Priority 0=Critical → 3=Low
+  // ที่มา: หนี้นอกระบบ อันตรายสูงสุด (ดอกเบี้ยมหาโหด เสี่ยงต่อความปลอดภัย)
+  //        ตามด้วยหนี้มีหลักประกัน (ถูกยึดกระทบชีวิตและอาชีพ)
+  //        ถัดมาหนี้ไม่มีหลักประกันดอกเบี้ยสูง และสุดท้ายหนี้ดอกเบี้ยต่ำ/สวัสดิการ
+  const DEBT_PRIORITY_MAP = {
+    'informal':      0,  // Priority 0 Critical — หนี้นอกระบบ ดอกเบี้ยมหาโหด เสี่ยงต่อความปลอดภัย
+    'home-loan':     1,  // Priority 1 High — หนี้มีหลักประกัน ถูกยึดกระทบที่พักอาศัย
+    'car-loan':      1,  // Priority 1 High — หนี้มีหลักประกัน ถูกยึดกระทบอาชีพ
+    'business-loan': 1,  // Priority 1 High — หนี้มีหลักประกัน กระทบรายได้
+    'credit-card':   2,  // Priority 2 Medium — ไม่มีหลักประกัน ดอกเบี้ยสูง
+    'personal-loan': 2,  // Priority 2 Medium — ไม่มีหลักประกัน ดอกเบี้ยสูง
+    'nano-finance':  2,  // Priority 2 Medium — ไม่มีหลักประกัน ดอกเบี้ยสูง (บัตรกดเงินสด)
+    'student-loan':  3,  // Priority 3 Low — ดอกเบี้ยต่ำ / หนี้สวัสดิการ
+    'other':         2,  // Priority 2 Medium (default)
+  };
+
+  const PRIORITY_CONFIG = {
+    0: { label: 'Priority 0 — วิกฤติ',   short: 'วิกฤติ',   cls: 'pri-0', desc: 'หนี้นอกระบบ — ดอกเบี้ยมหาโหด เสี่ยงต่อความปลอดภัยส่วนตัว' },
+    1: { label: 'Priority 1 — สูง',      short: 'สูง',      cls: 'pri-1', desc: 'หนี้มีหลักประกัน (บ้าน, รถ) — ถูกยึดกระทบการใช้ชีวิตและอาชีพ' },
+    2: { label: 'Priority 2 — ปานกลาง', short: 'ปานกลาง', cls: 'pri-2', desc: 'หนี้ไม่มีหลักประกันแต่ดอกเบี้ยสูง (บัตรเครดิต, บัตรกดเงินสด)' },
+    3: { label: 'Priority 3 — ต่ำ',      short: 'ต่ำ',      cls: 'pri-3', desc: 'หนี้ดอกเบี้ยต่ำหรือหนี้สวัสดิการ' },
+  };
+
+  /* ──────────────────────────────────────────
+     DROPDOWN OPTIONS
+  ────────────────────────────────────────── */
+  const INCOME_TYPES = [
+    ['salary','เงินเดือน / ค่าจ้าง'],['business','ธุรกิจ / การค้า'],
+    ['rental','ค่าเช่า'],['investment','เงินปันผล / การลงทุน'],
+    ['freelance','ฟรีแลนซ์ / งานพิเศษ'],['pension','บำนาญ / สวัสดิการรัฐ'],['other','อื่นๆ'],
+  ];
+  const DEBT_TYPES = [
+    ['home-loan','สินเชื่อบ้าน / คอนโด'],['car-loan','สินเชื่อรถยนต์'],
+    ['business-loan','สินเชื่อธุรกิจ'],['student-loan','กยศ. / กรอ.'],
+    ['credit-card','บัตรเครดิต'],['personal-loan','สินเชื่อส่วนบุคคล'],
+    ['nano-finance','นาโนไฟแนนซ์'],['informal','หนี้นอกระบบ'],['other','อื่นๆ'],
+  ];
+  const EXP_CATS = [
+    ['housing','ที่อยู่อาศัย (ค่าเช่า)'],['food','อาหารและเครื่องดื่ม'],
+    ['transport','การเดินทาง / น้ำมัน'],['utilities','ค่าสาธารณูปโภค'],
+    ['health','สุขภาพ / การแพทย์'],['education','การศึกษา'],
+    ['insurance','เบี้ยประกัน'],['entertainment','บันเทิง / ไลฟ์สไตล์'],
+    ['family','ดูแลครอบครัว'],['other','อื่นๆ'],
+  ];
+  const ASSET_TYPES = [
+    ['property','อสังหาริมทรัพย์'],['vehicle','รถยนต์ / จักรยานยนต์'],
+    ['stock','หุ้น / ตลาดทุน'],['fund','กองทุนรวม'],
+    ['gold','ทองคำ'],['business','กิจการ / ธุรกิจ'],['other','อื่นๆ'],
+  ];
+
+  function opts(arr) { return arr.map(([v,l]) => `<option value="${v}">${l}</option>`).join(''); }
+
+  /* ──────────────────────────────────────────
+     COUNTERS
+  ────────────────────────────────────────── */
+  let iCount = 0, dCount = 0, eCount = 0, aCount = 0;
+
+  /* ──────────────────────────────────────────
+     ADD ENTRIES
+  ────────────────────────────────────────── */
+  function addIncome() {
+    iCount++;
+    const id = `inc-${iCount}`, n = iCount;
+    appendBlock('income-list', id, `
+      <div class="entry-header">
+        <span class="entry-label">แหล่งรายได้ที่ ${n}</span>
+        ${n>1 ? rmBtn(id) : ''}
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>ประเภทรายได้</label>
+          <select class="i-type">${opts(INCOME_TYPES)}</select></div>
+        <div class="form-group"><label>จำนวนเงิน (฿/เดือน) <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="text" inputmode="numeric" class="i-amt" placeholder="0"
+              oninput="fmtComma(this); updateIncomeTotal()">
+            <span class="input-unit">฿/ด.</span>
+          </div></div>
+      </div>`);
+    updateIncomeTotal();
+  }
+
+  function addDebt() {
+    dCount++;
+    const id = `dbt-${dCount}`, n = dCount;
+    appendBlock('debt-list', id, `
+      <div class="entry-header">
+        <span class="entry-label">รายการหนี้ที่ ${n}</span>
+        ${n>1 ? rmBtn(id) : ''}
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label>ประเภทหนี้ <span class="req">*</span></label>
+          <select class="d-type">${opts(DEBT_TYPES)}</select></div>
+        <div class="form-group"><label>ชื่อเจ้าหนี้ / สถาบัน <span class="req">*</span></label>
+          <input type="text" class="d-cred" placeholder="เช่น ธนาคารกรุงไทย"></div>
+        <div class="form-group"><label>ยอดหนี้คงเหลือ (฿) <span class="req">*</span></label>
+          <div class="input-wrap"><input type="text" inputmode="numeric" class="d-bal" placeholder="0" oninput="fmtComma(this); updateDebtTotal()"><span class="input-unit">฿</span></div></div>
+        <div class="form-group"><label>ยอดผ่อน/เดือน — Min_Payment <span class="req">*</span></label>
+          <div class="input-wrap"><input type="text" inputmode="numeric" class="d-mo" placeholder="0" oninput="fmtComma(this); updateDebtTotal()"><span class="input-unit">฿/ด.</span></div></div>
+        <div class="form-group"><label>อัตราดอกเบี้ยต่อปี <span class="opt">(ถ้าทราบ)</span></label>
+          <div class="input-wrap"><input type="number" class="d-int" placeholder="0" min="0" max="100" step="0.01"><span class="input-unit">%/ปี</span></div></div>
+        <div class="form-group"><label>จำนวนงวดที่เหลือ <span class="opt">(ถ้าทราบ)</span></label>
+          <div class="input-wrap"><input type="number" class="d-terms" placeholder="0" min="0"><span class="input-unit">เดือน</span></div></div>
+        <div class="form-group form-full"><label>ประเภทดอกเบี้ย</label>
+          <div class="toggle-group">
+            <input type="radio" name="dint-${n}" id="flat-${n}" value="flat" checked>
+            <label for="flat-${n}">ดอกเบี้ยคงที่ (Flat Rate)</label>
+            <input type="radio" name="dint-${n}" id="red-${n}" value="reducing">
+            <label for="red-${n}">ลดต้นลดดอก (Reducing Balance)</label>
+          </div></div>
+      </div>`);
+  }
+
+  function addExpense() {
+    eCount++;
+    const id = `exp-${eCount}`, n = eCount;
+    appendBlock('expense-list', id, `
+      <div class="entry-header">
+        <span class="entry-label">ค่าใช้จ่ายที่ ${n}</span>
+        ${n>1 ? rmBtn(id) : ''}
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label>ชื่อค่าใช้จ่าย <span class="req">*</span></label>
+          <input type="text" class="e-name" placeholder="เช่น ค่าเช่าบ้าน"></div>
+        <div class="form-group"><label>หมวดหมู่</label>
+          <select class="e-cat">${opts(EXP_CATS)}</select></div>
+        <div class="form-group"><label>จำนวนเงิน (฿/เดือน) <span class="req">*</span></label>
+          <div class="input-wrap"><input type="text" inputmode="numeric" class="e-amt" placeholder="0" oninput="fmtComma(this); updateExpenseTotal()"><span class="input-unit">฿/ด.</span></div></div>
+        <div class="form-group form-full"><label>ประเภทค่าใช้จ่าย</label>
+          <div class="toggle-group">
+            <input type="radio" name="etype-${n}" id="fix-${n}" value="fixed" checked>
+            <label for="fix-${n}">คงที่ (Fixed) — เท่าเดิมทุกเดือน</label>
+            <input type="radio" name="etype-${n}" id="var-${n}" value="variable">
+            <label for="var-${n}">แปรผัน (Variable) — เปลี่ยนแต่ละเดือน</label>
+          </div></div>
+      </div>`);
+  }
+
+  function addAsset() {
+    aCount++;
+    const id = `ast-${aCount}`, n = aCount;
+    appendBlock('asset-list', id, `
+      <div class="entry-header">
+        <span class="entry-label">ทรัพย์สินที่ ${n}</span>
+        ${rmBtn(id)}
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label>ชื่อทรัพย์สิน</label>
+          <input type="text" class="a-name" placeholder="เช่น บ้านพักอาศัย"></div>
+        <div class="form-group"><label>ประเภท</label>
+          <select class="a-type">${opts(ASSET_TYPES)}</select></div>
+        <div class="form-group"><label>มูลค่าโดยประมาณ (฿)</label>
+          <div class="input-wrap"><input type="text" inputmode="numeric" class="a-val" placeholder="0" oninput="fmtComma(this); updateAssetTotal()"><span class="input-unit">฿</span></div></div>
+      </div>`);
+  }
+
+  function appendBlock(listId, id, inner) {
+    const div = document.createElement('div');
+    div.className = 'entry-block'; div.id = id;
+    div.innerHTML = inner;
+    document.getElementById(listId).appendChild(div);
+  }
+  function rmBtn(id) { return `<button class="btn-remove" onclick="rm('${id}')">ลบ</button>`; }
+  function rm(id) {
+    const el = document.getElementById(id); if (el) el.remove();
+    updateIncomeTotal(); updateDebtTotal(); updateExpenseTotal(); updateAssetTotal();
+  }
+
+  /* ──────────────────────────────────────────
+     COLLECT DATA
+  ────────────────────────────────────────── */
+  function collectData() {
+    const incomes = [];
+    document.querySelectorAll('#income-list .entry-block').forEach(b => {
+      const amt = parseComma(b.querySelector('.i-amt')?.value);
+      if (amt > 0) incomes.push({ type: fsel(b,'.i-type'), amount: amt });
+    });
+
+    const debts = [];
+    document.querySelectorAll('#debt-list .entry-block').forEach(b => {
+      const mo = fnum(b,'.d-mo'), bal = fnum(b,'.d-bal');
+      if (mo > 0 || bal > 0) debts.push({
+        type:    fsel(b,'.d-type'),
+        creditor:ftxt(b,'.d-cred'),
+        balance: bal,
+        monthly: mo,
+        interest:fnum(b,'.d-int'),
+        terms:   fnum(b,'.d-terms'),
+        intType: (b.querySelector('input[name^="dint"]:checked')||{}).value || 'flat',
+        priority: DEBT_PRIORITY_MAP[fsel(b,'.d-type')] ?? 2,
+      });
+    });
+
+    const expenses = [];
+    document.querySelectorAll('#expense-list .entry-block').forEach(b => {
+      const amt = fnum(b,'.e-amt');
+      if (amt > 0) expenses.push({
+        name: ftxt(b,'.e-name'), category: fsel(b,'.e-cat'), amount: amt,
+        type: (b.querySelector('input[name^="etype"]:checked')||{}).value || 'fixed',
+      });
+    });
+
+    const assets = [];
+    document.querySelectorAll('#asset-list .entry-block').forEach(b => {
+      const val = fnum(b,'.a-val');
+      if (val > 0) assets.push({ name: ftxt(b,'.a-name'), type: fsel(b,'.a-type'), value: val });
+    });
+
+    return {
+      incomes, debts, expenses, assets,
+      savBalance: fnum2('sav-balance'),
+      savMonthly: fnum2('sav-monthly'),
+      inCollection: document.getElementById('chk-collection').checked,
+    };
+  }
+
+  /* ── Comma formatting helpers ── */
+  function fmtComma(el) {
+    const raw = el.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+    el.value = raw === '' ? '' : parseInt(raw, 10).toLocaleString('th-TH');
+  }
+  function parseComma(val) {
+    return parseFloat((val || '').replace(/,/g, '')) || 0;
+  }
+  function updateIncomeTotal() {
+    let total = 0;
+    document.querySelectorAll('#income-list .i-amt').forEach(el => { total += parseComma(el.value); });
+    showTotal('income-total-row', total, [{ id:'income-total-value', val:total }]);
+  }
+
+  function updateDebtTotal() {
+    let bal = 0, mo = 0;
+    document.querySelectorAll('#debt-list .entry-block').forEach(b => {
+      bal += parseComma(b.querySelector('.d-bal')?.value);
+      mo  += parseComma(b.querySelector('.d-mo')?.value);
+    });
+    const row = document.getElementById('debt-total-row');
+    if (!row) return;
+    if (bal > 0 || mo > 0) {
+      row.style.display = 'flex';
+      document.getElementById('debt-total-balance').textContent = '฿' + bal.toLocaleString('th-TH');
+      document.getElementById('debt-total-monthly').textContent = '฿' + mo.toLocaleString('th-TH');
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
+  function updateExpenseTotal() {
+    let total = 0;
+    document.querySelectorAll('#expense-list .e-amt').forEach(el => { total += parseComma(el.value); });
+    showTotal('expense-total-row', total, [{ id:'expense-total-value', val:total }]);
+  }
+
+  function updateAssetTotal() {
+    let total = 0;
+    document.querySelectorAll('#asset-list .a-val').forEach(el => { total += parseComma(el.value); });
+    showTotal('asset-total-row', total, [{ id:'asset-total-value', val:total }]);
+  }
+
+  /* helper: show/hide a single-value total row */
+  function showTotal(rowId, total, targets) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    if (total > 0) {
+      row.style.display = 'flex';
+      targets.forEach(t => {
+        const el = document.getElementById(t.id);
+        if (el) el.textContent = '฿' + t.val.toLocaleString('th-TH');
+      });
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
+  function fnum(b,cls) { return parseComma(b.querySelector(cls)?.value); }
+  function ftxt(b,cls) { return b.querySelector(cls)?.value?.trim() || ''; }
+  function fsel(b,cls) { return b.querySelector(cls)?.value || ''; }
+  function fnum2(id)   { return parseComma(document.getElementById(id)?.value); }
+
+  /* ══════════════════════════════════════════════════════════
+     ALGORITHM [2] — NCF Calculation
+     NCF = Total_Income − Living_Expenses − Sum(Min_Payment)
+     ══════════════════════════════════════════════════════════
+     ALGORITHM [3] — Debt Priority Sort
+     ALGORITHM [4] — Context Routing (A / B / C / D)
+  ══════════════════════════════════════════════════════════ */
+  function analyze(d) {
+    // [1] Input Parameters
+    const totalIncome   = d.incomes.reduce((s,i) => s + i.amount, 0);
+    const livingExp     = d.expenses.reduce((s,e) => s + e.amount, 0);  // Living_Expenses
+    const sumMinPayment = d.debts.reduce((s,x) => s + x.monthly, 0);   // Sum(Min_Payment)
+
+    // [2] NCF
+    const NCF    = totalIncome - livingExp - sumMinPayment;
+    const ncfPct = totalIncome > 0 ? (NCF / totalIncome) * 100 : (NCF < 0 ? -100 : 0);
+    const dtiPct = totalIncome > 0 ? (sumMinPayment / totalIncome) * 100 : 0;
+    const expPct = totalIncome > 0 ? (livingExp / totalIncome) * 100 : 0;
+
+    // [3] Sort by Priority (0=Critical first)
+    const sortedDebts = [...d.debts].sort((a,b) => a.priority - b.priority);
+
+    // Avalanche: target highest interest debt first (Context A — Action 2)
+    const withInt       = d.debts.filter(x => x.interest > 0 && x.balance > 0);
+    const avalancheTarget = withInt.length > 0
+      ? [...withInt].sort((a,b) => b.interest - a.interest)[0]
+      : (d.debts.filter(x => x.balance > 0).sort((a,b) => b.monthly - a.monthly)[0] || null);
+
+    // Snowball: target lowest balance debt first (Context A — Action 2)
+    const snowballTarget = d.debts.filter(x => x.balance > 0).length > 0
+      ? [...d.debts].filter(x => x.balance > 0).sort((a,b) => a.balance - b.balance)[0]
+      : null;
+
+    // [4] Context Routing
+    let context;
+    if (d.inCollection)            context = 'D';
+    else if (NCF > 0)              context = 'A';
+    else if (NCF >= -(totalIncome * 0.15)) context = 'B'; // ≈0 or slightly negative
+    else                           context = 'C'; // severely negative
+
+    // Totals
+    const totalDebtBal  = d.debts.reduce((s,x) => s + x.balance, 0);
+    const totalAssetVal = d.assets.reduce((s,x) => s + x.value, 0);
+    const netWorth      = d.savBalance + totalAssetVal - totalDebtBal;
+
+    // Haircut Fund estimate (Context C): money saved by stopping Priority 2 payments
+    const pri2Monthly   = d.debts.filter(x => x.priority === 2).reduce((s,x) => s + x.monthly, 0);
+
+    // Consolidation potential: check if high-interest debts can be merged
+    const hiInterestDebts = d.debts.filter(x => x.interest > 15 && x.priority >= 2);
+
+    return {
+      context, NCF, ncfPct, totalIncome, livingExp, sumMinPayment,
+      dtiPct, expPct, sortedDebts, avalancheTarget, snowballTarget,
+      totalDebtBal, totalAssetVal, netWorth, pri2Monthly, hiInterestDebts,
+      savBalance: d.savBalance, savMonthly: d.savMonthly,
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     RENDER — Context-specific output
+  ══════════════════════════════════════════════════════════ */
+  const DEBT_LABEL = Object.fromEntries(DEBT_TYPES);
+  const CAT_LABEL  = Object.fromEntries(EXP_CATS);
+
+  function renderResults(d, an) {
+    let html = '';
+
+    /* ── NCF Summary Cards ── */
+    const ncfColor = an.NCF > 0 ? 'pos' : an.NCF < 0 ? 'neg' : '';
+    html += `
+      <div class="ncf-box">
+        <div class="ncf-card">
+          <div class="ncf-label">Total Income</div>
+          <div class="ncf-value pos">฿${fm(an.totalIncome)}</div>
+          <div class="ncf-sub">${d.incomes.length} แหล่งรายได้/เดือน</div>
+        </div>
+        <div class="ncf-card">
+          <div class="ncf-label">Living Expenses</div>
+          <div class="ncf-value neg">฿${fm(an.livingExp)}</div>
+          <div class="ncf-sub">ค่าครองชีพรายเดือน</div>
+        </div>
+        <div class="ncf-card">
+          <div class="ncf-label">Sum(Min_Payment)</div>
+          <div class="ncf-value neg">฿${fm(an.sumMinPayment)}</div>
+          <div class="ncf-sub">ยอดผ่อนหนี้ทั้งหมด/เดือน</div>
+        </div>
+        <div class="ncf-card highlight">
+          <div class="ncf-label">= NCF</div>
+          <div class="ncf-value ${ncfColor}">฿${fm(an.NCF)}</div>
+          <div class="ncf-sub">${an.ncfPct >= 0 ? '+' : ''}${an.ncfPct.toFixed(1)}% ของรายได้</div>
+        </div>
+      </div>`;
+
+    /* ── Context Banner ── */
+    html += renderContextBanner(an);
+
+    /* ── Income Allocation Bar ── */
+    const expBar = Math.min(an.expPct, 100);
+    const dtiBar = Math.min(an.dtiPct, 100);
+    const ncfBar = Math.max(0, Math.min(an.ncfPct, 100));
+    const dtiCol = an.dtiPct > 50 ? 'red' : an.dtiPct > 35 ? 'orange' : 'blue';
+    html += `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">📊</div>
+          <div><div class="card-title">การจัดสรรรายได้ต่อเดือน</div>
+          <div class="card-desc">NCF = รายได้ − ค่าครองชีพ − ยอดผ่อนหนี้รวม</div></div>
+        </div>
+        <div class="card-body">
+          <div class="pb-wrap">
+            <div class="pb-label"><span>ค่าครองชีพ (Living Expenses)</span><span>฿${fm(an.livingExp)} — ${expBar.toFixed(1)}%</span></div>
+            <div class="pb-track"><div class="pb-fill orange" style="width:${expBar}%"></div></div>
+          </div>
+          <div class="pb-wrap">
+            <div class="pb-label"><span>ยอดผ่อนหนี้ Sum(Min_Payment)</span><span>฿${fm(an.sumMinPayment)} — ${dtiBar.toFixed(1)}%</span></div>
+            <div class="pb-track"><div class="pb-fill ${dtiCol}" style="width:${dtiBar}%"></div></div>
+          </div>
+          <div class="pb-wrap">
+            <div class="pb-label"><span>NCF คงเหลือ</span><span>฿${fm(Math.max(0,an.NCF))} — ${ncfBar.toFixed(1)}%</span></div>
+            <div class="pb-track"><div class="pb-fill green" style="width:${ncfBar}%"></div></div>
+          </div>
+        </div>
+      </div>`;
+
+    /* ── Debt Priority Table ── */
+    if (d.debts.length > 0) {
+      html += `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">🏦</div>
+            <div><div class="card-title">ลำดับความสำคัญหนี้ — Debt Priority</div>
+            <div class="card-desc">จัดเรียงตาม Algorithm [3]: 0=วิกฤติ → 3=ต่ำ | ยอดหนี้รวม ฿${fm(an.totalDebtBal)}</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>Priority</th><th>ประเภทหนี้</th><th>เจ้าหนี้</th>
+                <th>ยอดคงเหลือ</th><th>ผ่อน/เดือน</th><th>ดอกเบี้ย/ปี</th>
+              </tr></thead>
+              <tbody>
+                ${an.sortedDebts.map(x => {
+                  const pc = PRIORITY_CONFIG[x.priority];
+                  return `<tr class="pri-highlight-${x.priority}">
+                    <td><span class="pri-badge ${pc.cls}">${pc.short}</span></td>
+                    <td><span class="badge badge-type">${DEBT_LABEL[x.type]||x.type}</span></td>
+                    <td>${x.creditor||'—'}</td>
+                    <td class="amt">฿${fm(x.balance)}</td>
+                    <td class="amt">฿${fm(x.monthly)}</td>
+                    <td class="amt">${x.interest>0 ? x.interest+'%' : '—'}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    /* ── Strategy (Context A only) ── */
+    if (an.context === 'A' && d.debts.length > 0) {
+      html += renderStrategy(an);
+    }
+
+    /* ── Expense Table ── */
+    if (d.expenses.length > 0) {
+      html += `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon orange">🛒</div>
+            <div><div class="card-title">รายละเอียด Living Expenses</div>
+            <div class="card-desc">รวม ฿${fm(an.livingExp)} / เดือน</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>รายการ</th><th>หมวดหมู่</th><th>ประเภท</th><th>฿/เดือน</th></tr></thead>
+              <tbody>
+                ${d.expenses.map(x => `<tr>
+                  <td>${x.name||'—'}</td>
+                  <td>${CAT_LABEL[x.category]||x.category}</td>
+                  <td><span class="badge ${x.type==='fixed'?'badge-fixed':'badge-variable'}">${x.type==='fixed'?'คงที่':'แปรผัน'}</span></td>
+                  <td class="amt">฿${fm(x.amount)}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    /* ── Net Worth ── */
+    if (d.savBalance > 0 || d.assets.length > 0 || an.totalDebtBal > 0) {
+      const totalA = d.savBalance + an.totalAssetVal;
+      html += `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">💰</div>
+            <div><div class="card-title">ทรัพย์สินสุทธิ (Net Worth)</div>
+            <div class="card-desc">ทรัพย์สินรวม − หนี้สินรวม</div></div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">ทรัพย์สินรวม</div>
+                <div style="font-size:24px;font-weight:700;color:var(--success);">฿${fm(totalA)}</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">เงินออม + สินทรัพย์อื่น</div>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">หนี้สินรวม</div>
+                <div style="font-size:24px;font-weight:700;color:var(--danger);">฿${fm(an.totalDebtBal)}</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">ยอดหนี้คงเหลือทั้งหมด</div>
+              </div>
+            </div>
+            <div class="nw-row">
+              <div class="nw-label">Net Worth</div>
+              <div class="nw-value" style="color:${an.netWorth>=0?'var(--success)':'var(--danger)'};">
+                ${an.netWorth<0?'−':''}฿${fm(Math.abs(an.netWorth))}
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('results-content').innerHTML = html;
+  }
+
+  /* ──────────────────────────────────────────
+     Context Banner + Action Plan
+  ────────────────────────────────────────── */
+  function renderContextBanner(an) {
+    const ctx = {
+      A: {
+        color:'green', emoji:'🟢', tag:'Context A',
+        title:'สภาพคล่องเป็นบวก — NCF > 0',
+        sub:'จ่ายขั้นต่ำได้ครบและยังมีเงินเหลือ สามารถเร่งชำระหนี้ได้',
+        rule:'หลักการ: รักษา Credit Score + โจมตีหนี้ด้วย NCF ที่เหลือ (Avalanche หรือ Snowball)',
+        actions: [
+          { t:'จ่าย Min_Payment ทุกก้อนอัตโนมัติ', d:'ชำระยอดขั้นต่ำของหนี้ทุกรายการตรงเวลา เพื่อรักษา Credit Score ไม่ให้เสียหาย ห้ามข้ามการจ่ายแม้แต่ก้อนเดียว' },
+          { t:'โจมตีหนี้ก้อนเป้าหมายด้วย NCF ที่เหลือ', d:'นำ NCF ทั้งหมดที่เหลือหลังจ่ายขั้นต่ำ ไปชำระหนี้เพิ่มเติมตามกลยุทธ์ที่เลือก (ดูด้านล่าง)' },
+          { t:'วนซ้ำจนกว่า Debt Array จะว่าง', d:'เมื่อหนี้ก้อนหนึ่งหมด ให้โอน Min_Payment + NCF ของก้อนนั้น ไปโจมตีก้อนถัดไปตามลำดับ (Debt Snowball Roll-over)' },
+        ],
+      },
+      B: {
+        color:'orange', emoji:'🟡', tag:'Context B',
+        title:'สภาพคล่องปริ่มน้ำ — NCF ≈ 0 หรือติดลบเล็กน้อย',
+        sub:'เริ่มหมุนเงินไม่ทัน ตึงมือ ต้องปรับสมดุลก่อนเพื่อดันให้ NCF กลับมาเป็นบวก',
+        rule:'หลักการ: ลดรายจ่าย + หารายได้เพิ่ม + พิจารณารวมหนี้เพื่อเปิด NCF',
+        actions: [
+          { t:'ตัดรายจ่ายแปรผันที่ไม่จำเป็นออกทันที', d:'ตรวจสอบ Living_Expenses และตัดค่าใช้จ่ายแปรผัน (บันเทิง ไลฟ์สไตล์) ออกก่อน เป้าหมายคือเพิ่ม NCF ให้กลับมาเป็นบวก' },
+          { t:'หาทางเพิ่ม Total_Income', d:'รับงานพิเศษ ฟรีแลนซ์ หรือขายสินทรัพย์ที่ไม่จำเป็น เพื่อเพิ่มรายได้เข้าสมการ NCF' },
+          { t:'พิจารณา Debt Consolidation หรือ Refinance', d:'ตรวจสอบว่าการรวมหนี้ดอกเบี้ยสูงเข้าด้วยกัน จะทำให้ Sum(Min_Payment) ลดลงหรือไม่ ถ้า NCF กลับมา > 0 ให้เข้าสู่ Context A' },
+          { t:'ห้ามกู้หมุนเพื่อชำระหนี้เก่า', d:'ห้ามสร้างหนี้ใหม่เพื่อมาจ่ายหนี้เก่าโดยเด็ดขาด (Halt the Cycle) จะทำให้ภาระหนี้สะสมจนเข้าสู่ Context C' },
+        ],
+      },
+      C: {
+        color:'red', emoji:'🔴', tag:'Context C',
+        title:'สภาพคล่องติดลบหนัก — NCF < 0',
+        sub:'จ่ายขั้นต่ำไม่ได้แล้ว ต้องรักษาสภาพคล่องก่อนเป็นอันดับแรก',
+        rule:'หลักการ: Liquidity is King — ดำรงชีวิตได้ก่อน แล้วค่อยเจรจาปรับโครงสร้างหนี้',
+        actions: [
+          { t:'รักษา Survival Cash Flow', d:`ใช้เงิน Total_Income − Living_Expenses (฿${fm(Math.max(0, an.totalIncome - an.livingExp))}/เดือน) ไว้กับตัวเพื่อดำรงชีวิต อย่านำเงินก้อนสุดท้ายไปชำระหนี้จนตัวเองขาดสภาพคล่อง` },
+          { t:'ติดต่อเจ้าหนี้เพื่อขอปรับโครงสร้างหนี้', d:'เจรจาขอ: พักชำระต้น (จ่ายเฉพาะดอก), ลดอัตราดอกเบี้ย, ยืดระยะเวลาผ่อน หรือขอ Moratorium ชั่วคราว' },
+          { t:'สะสม Haircut Fund จากหนี้ Priority 2', d:`หากเจรจาไม่สำเร็จ หยุดชำระหนี้ไม่มีหลักประกัน (Priority 2) แล้วนำเงิน ฿${fm(an.pri2Monthly)}/เดือนที่ประหยัดได้ สะสมเป็น Haircut Fund เพื่อต่อรองในภายหลัง` },
+          { t:'ใช้ Haircut Fund ต่อรองลดหนี้โดยตรง', d:'เมื่อเจ้าหนี้เสนอส่วนลด (Haircut) ให้นำเงินก้อนที่สะสมไว้มายื่นข้อเสนอชำระครั้งเดียว เพื่อปิดหนี้ในราคาที่ต่ำกว่ายอดเต็ม' },
+        ],
+      },
+      D: {
+        color:'black', emoji:'⚫', tag:'Context D',
+        title:'เข้าสู่กระบวนการทวงถามหรือขั้นศาล (Collection & Legal Process)',
+        sub:'ผิดนัดชำระจนมีการติดตามทวงถาม — ต้องร่วมมือและใช้สิทธิ์ทางกฎหมายอย่างถูกต้อง',
+        rule:'หลักการ: ร่วมมือเสมอ + ไปศาลทุกนัด + ใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา',
+        actions: [
+          { t:'รับสายและสื่อสารกับเจ้าหน้าที่ทวงถามเสมอ', d:'การให้ความร่วมมือจะช่วยป้องกันไม่ให้ระบบ Auto-Dialer หรือ Agent Workspace ของฝั่งเจ้าหนี้บันทึกล็อกสถานะว่าเรามี "เจตนาหลบหนี้ (Skip Tracing)" ซึ่งจะส่งผลให้การเจรจาขอยกเว้นดอกเบี้ยปรับในอนาคตยากขึ้น' },
+          { t:'ต้องไปศาลตามนัดทุกครั้ง', d:'หากเรื่องถึงขั้นตอนการฟ้องร้อง ต้องไปศาลตามนัดทุกครั้งโดยไม่ขาดนัด เพราะสิทธิ์ในการต่อสู้คดีและเจรจาจะหมดไปหากไม่ปรากฏตัว' },
+          { t:'ใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา', d:`ใช้สิทธิ์ในการไกล่เกลี่ยต่อหน้าผู้พิพากษา เพื่อขอลดหย่อนค่าธรรมเนียม ดอกเบี้ยปรับ และตกลงยอดผ่อนชำระใหม่ที่สอดคล้องกับ NCF ที่แท้จริงของเรา (฿${fm(Math.max(0, an.NCF))}/เดือน)` },
+        ],
+      },
+    }[an.context];
+
+    const ac = ctx.color === 'green' ? 'green' : ctx.color === 'orange' ? 'orange' : ctx.color === 'red' ? 'red' : 'black';
+
+    let actionsHtml = ctx.actions.map((a,i) => `
+      <li class="action-item ${ac}">
+        <div class="action-num">${i+1}</div>
+        <div class="action-text"><strong>${a.t}</strong>${a.d}</div>
+      </li>`).join('');
+
+    return `
+      <div class="ctx-banner ${ac}">
+        <div class="ctx-top">
+          <div class="ctx-icon">${ctx.emoji}</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;opacity:.7;margin-bottom:2px;">${ctx.tag}</div>
+            <div class="ctx-title">${ctx.title}</div>
+            <div class="ctx-sub">${ctx.sub}</div>
+          </div>
+        </div>
+        <div class="ctx-rule">📌 ${ctx.rule}</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon ${ac==='black'?'gray':ac}">📋</div>
+          <div><div class="card-title">แผนดำเนินการ — Action Plan</div>
+          <div class="card-desc">ขั้นตอนที่แนะนำตาม Algorithm สำหรับ ${ctx.tag}</div></div>
+        </div>
+        <div class="card-body">
+          <ul class="action-list">${actionsHtml}</ul>
+        </div>
+      </div>`;
+  }
+
+  /* ──────────────────────────────────────────
+     Strategy Card (Context A only)
+     Avalanche vs Snowball
+  ────────────────────────────────────────── */
+  function renderStrategy(an) {
+    if (!an.avalancheTarget && !an.snowballTarget) return '';
+
+    const ava = an.avalancheTarget;
+    const sno = an.snowballTarget;
+
+    // Recommend Avalanche if NCF is large enough to matter; Snowball if many small debts
+    const hasManyDebts   = an.sortedDebts.length > 3;
+    const recommend      = hasManyDebts ? 'snowball' : 'avalanche';
+
+    const avaCard = ava ? `
+      <div class="strategy-card ${recommend==='avalanche'?'recommended':''}">
+        ${recommend==='avalanche' ? '<span class="strategy-badge">แนะนำ</span>' : ''}
+        <div class="strategy-title">🏔️ Avalanche Method</div>
+        <div class="strategy-target">เป้าหมายถัดไป: <strong>${ava.creditor||DEBT_LABEL[ava.type]} (${ava.interest}%/ปี)</strong></div>
+        <div class="strategy-note">ชำระหนี้ดอกเบี้ยสูงสุดก่อน — ประหยัดดอกเบี้ยรวมได้มากที่สุดในระยะยาว แต่ใช้เวลาเห็นผลนานกว่า</div>
+      </div>` : '';
+
+    const snoCard = sno ? `
+      <div class="strategy-card ${recommend==='snowball'?'recommended':''}">
+        ${recommend==='snowball' ? '<span class="strategy-badge">แนะนำ</span>' : ''}
+        <div class="strategy-title">⛄ Snowball Method</div>
+        <div class="strategy-target">เป้าหมายถัดไป: <strong>${sno.creditor||DEBT_LABEL[sno.type]} (฿${fm(sno.balance)})</strong></div>
+        <div class="strategy-note">ชำระหนี้ยอดน้อยที่สุดก่อน — สร้างแรงจูงใจ ปิดหนี้ได้เร็ว แล้วโอน Min_Payment ไปก้อนถัดไป</div>
+      </div>` : '';
+
+    return `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">🎯</div>
+          <div><div class="card-title">กลยุทธ์การชำระหนี้ — Context A Action 2</div>
+          <div class="card-desc">นำ NCF ฿${fm(an.NCF)}/เดือน โจมตีหนี้เป้าหมาย</div></div>
+        </div>
+        <div class="card-body">
+          <div class="strategy-grid">${avaCard}${snoCard}</div>
+          <div style="margin-top:12px; padding:10px 14px; background:var(--primary-light); border-radius:var(--radius-sm); font-size:13px; color:var(--primary);">
+            💡 <strong>Debt Roll-over:</strong> เมื่อปิดหนี้ก้อนใดได้แล้ว ให้โอนยอด Min_Payment ของก้อนนั้นทั้งหมด ไปรวมกับ NCF แล้วโจมตีก้อนถัดไป วนซ้ำจนกว่า Debt Array จะว่างเปล่า
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* ──────────────────────────────────────────
+     NAVIGATION
+  ────────────────────────────────────────── */
+  function nextStep(from) {
+    if (from === 1) {
+      let ok = false;
+      document.querySelectorAll('#income-list .entry-block').forEach(b => {
+        if (parseComma(b.querySelector('.i-amt')?.value) > 0) ok = true;
+      });
+      if (!ok) { alert('กรุณากรอกรายได้อย่างน้อย 1 รายการ'); return; }
+    }
+    goStep(from + 1);
+  }
+  function prevStep(from) { goStep(from - 1); }
+
+  function doAnalyze() {
+    const d  = collectData();
+    const an = analyze(d);
+    renderResults(d, an);
+    goStep(5);
+  }
+
+  function doRestart() {
+    if (!confirm('ต้องการเริ่มต้นใหม่ทั้งหมด?')) return;
+    ['income-list','debt-list','expense-list','asset-list'].forEach(id => {
+      document.getElementById(id).innerHTML = '';
+    });
+    document.getElementById('sav-balance').value = '';
+    document.getElementById('sav-monthly').value = '';
+    document.getElementById('chk-collection').checked = false;
+    document.getElementById('results-content').innerHTML = '';
+    iCount = dCount = eCount = aCount = 0;
+    addIncome(); addDebt(); addExpense();
+    updateDebtTotal(); updateExpenseTotal(); updateAssetTotal();
+    goStep(1);
+  }
+
+  function goStep(n) {
+    document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(`step-${n}`).classList.add('active');
+    document.querySelectorAll('.step-item').forEach((el,i) => {
+      el.classList.remove('active','completed');
+      const c = el.querySelector('.step-circle');
+      if      (i+1 < n) { el.classList.add('completed'); c.textContent = '✓'; }
+      else if (i+1 === n){ el.classList.add('active');    c.textContent = i+1; }
+      else               {                                c.textContent = i+1; }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function fm(v) {
+    if (isNaN(v)) return '0';
+    return Math.abs(v).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  /* Init */
+  addIncome(); addDebt(); addExpense();
+</script>
+</body>
+</html>
