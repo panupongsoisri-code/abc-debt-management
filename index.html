@@ -347,6 +347,49 @@
     /* Footer */
     .page-footer { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--gray-100); font-weight: 300; }
 
+    /* ───── Splash Keyframes & Animations ───── */
+    @keyframes splashEnter {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes splashSlideUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes splashGlow {
+      0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+      50%       { box-shadow: 0 4px 36px rgba(255,255,255,.28), 0 8px 28px rgba(0,0,0,.18); }
+    }
+    @keyframes splashFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-11px); }
+    }
+    @keyframes confettiDrift {
+      0%   { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(18px) rotate(32deg); }
+    }
+    @keyframes confettiDriftAlt {
+      0%   { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-14px) rotate(-28deg); }
+    }
+    /* Illustration float — applied to .splash-img */
+    /* Confetti drift — alternating direction + staggered delays */
+    .confetti rect:nth-child(odd)   { animation: confettiDrift    3.2s ease-in-out infinite alternate; }
+    .confetti rect:nth-child(even)  { animation: confettiDriftAlt 4.1s ease-in-out infinite alternate; }
+    .confetti circle:nth-child(odd) { animation: confettiDrift    3.7s ease-in-out infinite alternate; }
+    .confetti circle:nth-child(even){ animation: confettiDriftAlt 4.6s ease-in-out infinite alternate; }
+    .confetti :nth-child(2)  { animation-delay: .3s; }
+    .confetti :nth-child(3)  { animation-delay: .6s; }
+    .confetti :nth-child(4)  { animation-delay: .9s; }
+    .confetti :nth-child(5)  { animation-delay: .2s; }
+    .confetti :nth-child(6)  { animation-delay: .7s; }
+    .confetti :nth-child(7)  { animation-delay: .4s; }
+    .confetti :nth-child(8)  { animation-delay: 1s;  }
+    .confetti :nth-child(9)  { animation-delay: .5s; }
+    .confetti :nth-child(10) { animation-delay: .8s; }
+    .confetti :nth-child(11) { animation-delay: .15s;}
+    .confetti :nth-child(12) { animation-delay: 1.1s;}
+
     /* Print */
     @media print {
       .header, .progress-steps, .nav-footer, .page-footer { display: none !important; }
@@ -359,11 +402,12 @@
     ═══════════════════════════════════════════════ */
     .splash {
       position: fixed; inset: 0; z-index: 999;
-      background: var(--primary);
+      background: radial-gradient(ellipse at 50% 20%, #4848d8 0%, #2020a0 100%);
       display: flex; flex-direction: column;
       align-items: center;
       overflow: hidden;
       transition: opacity .4s ease, transform .4s ease;
+      animation: splashEnter .5s cubic-bezier(.22,1,.36,1) both;
     }
     .splash.hidden {
       opacity: 0; pointer-events: none; transform: translateY(-16px);
@@ -377,6 +421,7 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background .2s;
       backdrop-filter: blur(4px);
+      animation: splashSlideUp .4s ease .55s both;
     }
     .splash-close:hover { background: rgba(255,255,255,.35); }
     .splash-close svg { width: 18px; height: 18px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
@@ -390,10 +435,12 @@
     .splash-heading {
       font-size: 32px; font-weight: 700; line-height: 1.25;
       letter-spacing: -0.5px; margin-bottom: 14px;
+      animation: splashSlideUp .6s cubic-bezier(.22,1,.36,1) .12s both;
     }
     .splash-sub {
       font-size: 16px; font-weight: 400;
       opacity: .88; line-height: 1.5;
+      animation: splashSlideUp .6s cubic-bezier(.22,1,.36,1) .26s both;
     }
 
     /* Illustration */
@@ -406,6 +453,27 @@
       width: 100%; max-width: 420px;
       height: auto; display: block;
     }
+    /* Celebration image — scales by available height, never overflows width */
+    .splash-img {
+      height: 100%;
+      width: auto;
+      max-height: min(56vh, 480px);
+      max-width: 88vw;
+      display: block;
+      object-fit: contain;
+      object-position: bottom center;
+      position: relative; z-index: 1;
+      animation: splashFloat 4s ease-in-out .6s infinite;
+    }
+    /* Short screens (landscape phone / small device) */
+    @media (max-height: 680px) {
+      .splash-img { max-height: min(50vh, 320px); }
+      .splash-text { padding-top: 48px; }
+    }
+    @media (max-height: 540px) {
+      .splash-img { max-height: 44vh; }
+      .splash-heading { font-size: 26px; }
+    }
 
     /* Confetti dots */
     .confetti { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -415,6 +483,7 @@
     .splash-cta-wrap {
       width: 100%; padding: 20px 24px 36px;
       flex-shrink: 0;
+      animation: splashSlideUp .6s cubic-bezier(.22,1,.36,1) .42s both;
     }
     .splash-cta {
       width: 100%; padding: 16px 24px;
@@ -424,8 +493,9 @@
       font-family: 'Kanit', sans-serif;
       cursor: pointer; transition: all .2s;
       box-shadow: 0 4px 20px rgba(0,0,0,.15);
+      animation: splashGlow 2.6s ease-in-out 1.4s infinite;
     }
-    .splash-cta:hover { background: #eeeeff; transform: translateY(-1px); }
+    .splash-cta:hover { background: #eeeeff; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.22); }
     .splash-cta:active { transform: translateY(0); }
 
     /* Tablet */
@@ -499,87 +569,8 @@
       <rect x="240" y="100" width="8"  height="12" rx="2" fill="#FCAF17" transform="rotate(15 244 106)"/>
     </svg>
 
-    <!-- Two people celebrating SVG illustration -->
-    <svg viewBox="0 0 320 380" xmlns="http://www.w3.org/2000/svg">
-      <!-- ── Person LEFT (man) ── -->
-      <!-- Body / shirt (dark blue) -->
-      <rect x="68" y="175" width="68" height="90" rx="10" fill="#2828A8"/>
-      <!-- Collar white -->
-      <polygon points="102,175 88,198 102,192 116,198" fill="#fff"/>
-      <!-- Left arm raised up-left -->
-      <line x1="68" y1="190" x2="30" y2="130" stroke="#2828A8" stroke-width="22" stroke-linecap="round"/>
-      <!-- Fist left -->
-      <ellipse cx="28" cy="122" rx="13" ry="11" fill="#f5c5a3"/>
-      <!-- Right arm down -->
-      <line x1="136" y1="195" x2="155" y2="240" stroke="#2828A8" stroke-width="22" stroke-linecap="round"/>
-      <!-- Hand right -->
-      <ellipse cx="157" cy="248" rx="12" ry="10" fill="#f5c5a3"/>
-      <!-- Pants (dark navy) -->
-      <rect x="68" y="262" width="30" height="90" rx="8" fill="#1e1e5e"/>
-      <rect x="100" y="262" width="30" height="90" rx="8" fill="#1e1e5e"/>
-      <!-- Neck -->
-      <rect x="94" y="152" width="18" height="28" rx="6" fill="#f5c5a3"/>
-      <!-- Head -->
-      <ellipse cx="103" cy="135" rx="28" ry="28" fill="#f5c5a3"/>
-      <!-- Hair -->
-      <ellipse cx="103" cy="110" rx="28" ry="14" fill="#1a1a2e"/>
-      <rect x="75" y="108" width="56" height="12" rx="6" fill="#1a1a2e"/>
-      <!-- Eyes -->
-      <ellipse cx="94"  cy="132" rx="4" ry="4.5" fill="#1a1a2e"/>
-      <ellipse cx="112" cy="132" rx="4" ry="4.5" fill="#1a1a2e"/>
-      <!-- Smile -->
-      <path d="M92 144 Q103 154 114 144" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- Cheeks -->
-      <ellipse cx="87"  cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
-      <ellipse cx="119" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
-      <!-- Watch -->
-      <rect x="148" y="243" width="16" height="10" rx="3" fill="#555"/>
-
-      <!-- ── Person RIGHT (woman) ── -->
-      <!-- Body / blouse (white) -->
-      <rect x="184" y="175" width="68" height="85" rx="10" fill="#ffffff"/>
-      <!-- Collar detail -->
-      <polygon points="218,175 204,196 218,188 232,196" fill="#dde3ff"/>
-      <!-- Buttons -->
-      <circle cx="218" cy="205" r="3.5" fill="#3535C8"/>
-      <circle cx="218" cy="218" r="3.5" fill="#3535C8"/>
-      <!-- Stripe sleeves -->
-      <rect x="184" y="205" width="68" height="5" rx="2" fill="#dde3ff"/>
-      <rect x="184" y="214" width="68" height="5" rx="2" fill="#dde3ff"/>
-      <!-- Left arm down -->
-      <line x1="184" y1="195" x2="165" y2="240" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
-      <!-- Hand left -->
-      <ellipse cx="163" cy="248" rx="12" ry="10" fill="#f5c5a3"/>
-      <!-- Right arm raised up-right -->
-      <line x1="252" y1="190" x2="292" y2="128" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
-      <!-- Fist right -->
-      <ellipse cx="294" cy="120" rx="13" ry="11" fill="#f5c5a3"/>
-      <!-- Pants / skirt (dark navy) -->
-      <rect x="184" y="258" width="68" height="8"  rx="4" fill="#b0b8e8"/>
-      <rect x="184" y="264" width="32" height="88" rx="8" fill="#1e1e5e"/>
-      <rect x="218" y="264" width="32" height="88" rx="8" fill="#1e1e5e"/>
-      <!-- Neck -->
-      <rect x="210" y="152" width="18" height="28" rx="6" fill="#f5c5a3"/>
-      <!-- Head -->
-      <ellipse cx="219" cy="135" rx="28" ry="28" fill="#f5c5a3"/>
-      <!-- Hair (long, dark) -->
-      <ellipse cx="219" cy="110" rx="29" ry="14" fill="#1a1a2e"/>
-      <rect x="191" y="108" width="18" height="52" rx="8" fill="#1a1a2e"/>
-      <rect x="247" y="108" width="18" height="52" rx="8" fill="#1a1a2e"/>
-      <rect x="191" y="108" width="57" height="14" rx="6" fill="#1a1a2e"/>
-      <!-- Eyes (closed — happy) -->
-      <path d="M209 132 Q213 128 217 132" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M221 132 Q225 128 229 132" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- Smile -->
-      <path d="M207 144 Q219 156 231 144" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- Cheeks -->
-      <ellipse cx="203" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
-      <ellipse cx="235" cy="142" rx="6" ry="4" fill="#f4a0a0" opacity=".55"/>
-
-      <!-- Shared podium / ground platform -->
-      <rect x="50" y="348" width="222" height="32" rx="10" fill="rgba(255,255,255,.18)"/>
-      <rect x="110" y="330" width="102" height="22" rx="6" fill="rgba(255,255,255,.12)"/>
-    </svg>
+    <!-- Celebration illustration -->
+    <img class="splash-img" src="assets/celebration.png" alt="สองคนฉลองปลดหนี้"/>
   </div>
 
   <!-- CTA -->
