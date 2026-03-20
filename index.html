@@ -1446,7 +1446,35 @@
     const d  = collectData();
     const an = analyze(d);
     renderResults(d, an);
+    saveSubmission(d, an);
     goStep(5);
+  }
+
+  /* ── Admin: persist submission to localStorage ── */
+  function saveSubmission(d, an) {
+    try {
+      const list = JSON.parse(localStorage.getItem('hd_submissions') || '[]');
+      list.push({
+        id:        'sess_' + Date.now(),
+        timestamp: new Date().toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' }),
+        timestampISO: new Date().toISOString(),
+        data: d,
+        analysis: {
+          context:       an.context,
+          NCF:           an.NCF,
+          ncfPct:        an.ncfPct,
+          totalIncome:   an.totalIncome,
+          livingExp:     an.livingExp,
+          sumMinPayment: an.sumMinPayment,
+          dtiPct:        an.dtiPct,
+          expPct:        an.expPct,
+          totalDebtBal:  an.totalDebtBal,
+          totalAssetVal: an.totalAssetVal,
+          netWorth:      an.netWorth,
+        },
+      });
+      localStorage.setItem('hd_submissions', JSON.stringify(list));
+    } catch(e) { /* localStorage unavailable — silently skip */ }
   }
 
   function doRestart() {

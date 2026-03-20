@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Report — HealthDebt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #3535C8; --primary-dark: #2828A8; --primary-light: #eeeeff;
+      --success: #00778b; --success-light: #00b2a9;
+      --danger: #ec1e35; --danger-bg: #fef0f2;
+      --warning: #f86b0f;
+      --gray-50: #f5f5f8; --gray-100: #ededf2; --gray-200: #dddde6;
+      --gray-300: #c8c8d4; --gray-400: #9494a8; --gray-500: #6b6b80;
+      --gray-600: #4a4a5e; --gray-700: #32324a; --gray-800: #1e1e36;
+      --gray-900: #121220; --white: #fff;
+      --radius: 16px; --radius-sm: 12px;
+    }
+    body { font-family: 'Kanit', sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+    /* ── Header ── */
+    .header { background: var(--primary); padding: 16px 24px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 20px rgba(53,53,200,.35); }
+    .header-logo { width: 44px; height: 44px; background: rgba(255,255,255,.18); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; backdrop-filter: blur(4px); }
+    .header-title { font-size: 20px; font-weight: 600; color: #fff; letter-spacing: -.3px; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,.7); font-weight: 300; }
+    .header-badge { margin-left: auto; background: rgba(255,255,255,.2); color: #fff; border-radius: 100px; padding: 4px 14px; font-size: 12px; font-weight: 500; border: 1px solid rgba(255,255,255,.3); }
+
+    /* ── Container ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    /* ── Stats Row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 18px 20px; box-shadow: 0 2px 8px rgba(18,18,64,.06); }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-400); font-weight: 500; margin-bottom: 6px; }
+    .stat-value { font-size: 28px; font-weight: 600; color: var(--gray-900); }
+    .stat-sub { font-size: 12px; color: var(--gray-500); font-weight: 300; margin-top: 3px; }
+
+    /* ── Action Bar ── */
+    .action-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .action-bar h2 { font-size: 18px; font-weight: 500; color: var(--gray-900); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { padding: 10px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; font-family: 'Kanit', sans-serif; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 7px; transition: all .2s; }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(53,53,200,.35); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-danger  { background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger); }
+    .btn-danger:hover  { background: var(--danger); color: #fff; }
+    .btn-outline { background: var(--white); color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Table ── */
+    .table-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(18,18,64,.06); overflow: hidden; }
+    .table-wrap { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+    .data-table thead tr { background: var(--gray-50); }
+    .data-table th { text-align: left; padding: 11px 14px; color: var(--gray-500); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--gray-100); white-space: nowrap; }
+    .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); font-weight: 300; white-space: nowrap; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--gray-50); }
+    .num { text-align: right; font-weight: 500; color: var(--gray-900); }
+    .ctx-a { background: rgba(0,178,169,.12); color: #005b65; }
+    .ctx-b { background: rgba(251,175,23,.15); color: #8a6200; }
+    .ctx-c { background: rgba(248,107,15,.12); color: #9a3400; }
+    .ctx-d { background: rgba(236,30,53,.12); color: #b71c2c; }
+    .ctx-badge { display: inline-flex; padding: 3px 10px; border-radius: 100px; font-size: 12px; font-weight: 500; }
+    .pos { color: var(--success-light); }
+    .neg { color: var(--danger); }
+    .flag { display: inline-flex; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+    .flag-yes { background: var(--danger-bg); color: var(--danger); }
+    .flag-no  { background: var(--gray-100); color: var(--gray-500); }
+
+    /* ── Empty / Access Denied ── */
+    .center-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 14px; }
+    .state-icon { font-size: 52px; }
+    .state-title { font-size: 22px; font-weight: 500; color: var(--gray-900); }
+    .state-sub { font-size: 14px; color: var(--gray-500); font-weight: 300; max-width: 360px; line-height: 1.6; }
+    .code-block { background: var(--gray-900); color: #a8e6cf; border-radius: var(--radius-sm); padding: 10px 18px; font-family: monospace; font-size: 14px; }
+
+    /* ── Info bar ── */
+    .info-bar { background: rgba(53,53,200,.07); border: 1px solid rgba(53,53,200,.2); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-weight: 300; }
+
+    /* ── Download toast ── */
+    #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--gray-900); color: #fff; padding: 12px 22px; border-radius: 100px; font-size: 14px; font-weight: 400; box-shadow: 0 8px 24px rgba(0,0,0,.25); transition: transform .35s ease, opacity .35s ease; opacity: 0; pointer-events: none; white-space: nowrap; }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .action-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Access Denied State -->
+<div id="page-denied" style="display:none">
+  <div class="center-state" style="padding: 40px 20px;">
+    <div class="state-icon">🔒</div>
+    <div class="state-title">Access Denied</div>
+    <div class="state-sub">คุณไม่มีสิทธิ์เข้าถึงหน้านี้<br>กรุณาใช้ลิงก์ที่ถูกต้องจาก Admin</div>
+  </div>
+</div>
+
+<!-- No Data State -->
+<div id="page-empty" style="display:none">
+  <header class="header">
+    <div class="header-logo">⚡</div>
+    <div><div class="header-title">Admin Report</div><div class="header-sub">HealthDebt — ระบบรายงานข้อมูลผู้ใช้</div></div>
+    <span class="header-badge">🔐 Admin</span>
+  </header>
+  <div class="container">
+    <div class="center-state">
+      <div class="state-icon">📋</div>
+      <div class="state-title">ยังไม่มีข้อมูล</div>
+      <div class="state-sub">ยังไม่มีผู้ใช้กรอกข้อมูลและดูผลวิเคราะห์ในเครื่องนี้<br>เมื่อผู้ใช้กด "ดูผลวิเคราะห์" ข้อมูลจะถูกบันทึกอัตโนมัติ</div>
+      <a href="index.html" style="color: var(--primary); font-size: 14px; text-decoration: none;">← กลับหน้าหลัก</a>
+    </div>
+  </div>
+</div>
+
+<!-- Main Report Page -->
+<div id="page-app" style="display:none">
+  <header class="header">
+    <div class="header-logo">⚡</div>
+    <div><div class="header-title">Admin Report</div><div class="header-sub">HealthDebt — ระบบรายงานข้อมูลผู้ใช้</div></div>
+    <span class="header-badge">🔐 Admin</span>
+  </header>
+
+  <div class="container">
+
+    <!-- Info bar -->
+    <div class="info-bar">
+      ℹ️ ข้อมูลเก็บใน localStorage ของเบราว์เซอร์นี้ — ต้องเปิดหน้านี้ในเครื่องเดียวกับที่ผู้ใช้กรอกข้อมูล
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">จำนวน Sessions</div>
+        <div class="stat-value" id="stat-count">—</div>
+        <div class="stat-sub">ทั้งหมดในเครื่องนี้</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Session ล่าสุด</div>
+        <div class="stat-value" id="stat-latest" style="font-size: 16px; margin-top: 4px;">—</div>
+        <div class="stat-sub">วันที่-เวลา</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">รายได้เฉลี่ย/เดือน</div>
+        <div class="stat-value" id="stat-avg-income" style="font-size: 20px; margin-top: 4px;">—</div>
+        <div class="stat-sub">บาท/เดือน</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">หนี้รวมเฉลี่ย</div>
+        <div class="stat-value" id="stat-avg-debt" style="font-size: 20px; margin-top: 4px;">—</div>
+        <div class="stat-sub">บาท</div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <h2>รายการทั้งหมด</h2>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="location.reload()">🔄 รีเฟรช</button>
+        <button class="btn btn-danger"  onclick="clearData()">🗑️ ลบข้อมูลทั้งหมด</button>
+        <button class="btn btn-primary" onclick="downloadExcel()">⬇️ ดาวน์โหลด Excel</button>
+      </div>
+    </div>
+
+    <!-- Summary Table -->
+    <div class="table-card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>วันที่-เวลา</th>
+              <th>Context</th>
+              <th class="num">รายได้รวม (฿)</th>
+              <th class="num">ค่าใช้จ่าย (฿)</th>
+              <th class="num">ยอดผ่อนหนี้ (฿)</th>
+              <th class="num">NCF (฿)</th>
+              <th class="num">DTI%</th>
+              <th class="num">หนี้รวม (฿)</th>
+              <th class="num">ทรัพย์สินสุทธิ (฿)</th>
+              <th>ถูกติดตามหนี้</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">✅ ดาวน์โหลด Excel สำเร็จ</div>
+
+<script>
+  /* ─────────────────────────────────────────────
+     CONFIG — Change ADMIN_KEY to secure the page
+  ───────────────────────────────────────────── */
+  const ADMIN_KEY = 'HealthDebt@2026';
+
+  /* ── Label maps (mirrors index.html) ── */
+  const INCOME_LABEL   = { salary:'เงินเดือน/ค่าจ้าง', business:'ธุรกิจ/การค้า', rental:'ค่าเช่า', investment:'เงินปันผล/ลงทุน', freelance:'ฟรีแลนซ์', pension:'บำนาญ', other:'อื่นๆ' };
+  const DEBT_LABEL     = { 'home-loan':'สินเชื่อบ้าน/คอนโด', 'car-loan':'สินเชื่อรถยนต์', 'business-loan':'สินเชื่อธุรกิจ', 'student-loan':'กยศ./กรอ.', 'credit-card':'บัตรเครดิต', 'personal-loan':'สินเชื่อส่วนบุคคล', 'nano-finance':'นาโนไฟแนนซ์', 'informal':'หนี้นอกระบบ', other:'อื่นๆ' };
+  const EXP_LABEL      = { housing:'ที่อยู่อาศัย', food:'อาหาร', transport:'การเดินทาง', utilities:'สาธารณูปโภค', health:'สุขภาพ', education:'การศึกษา', insurance:'ประกัน', entertainment:'บันเทิง', family:'ดูแลครอบครัว', other:'อื่นๆ' };
+  const ASSET_LABEL    = { property:'อสังหาริมทรัพย์', vehicle:'รถยนต์/จักรยานยนต์', stock:'หุ้น/ตลาดทุน', fund:'กองทุนรวม', gold:'ทองคำ', business:'กิจการ/ธุรกิจ', other:'อื่นๆ' };
+  const PRIORITY_LABEL = { 0:'วิกฤติ', 1:'สูง', 2:'ปานกลาง', 3:'ต่ำ' };
+
+  const fmt = n => Number(n||0).toLocaleString('th-TH');
+
+  /* ── Auth check ── */
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('key') !== ADMIN_KEY) {
+    document.getElementById('page-denied').style.display = 'block';
+  } else {
+    init();
+  }
+
+  /* ── Global data ── */
+  let submissions = [];
+
+  function init() {
+    try {
+      submissions = JSON.parse(localStorage.getItem('hd_submissions') || '[]');
+    } catch(e) { submissions = []; }
+
+    if (submissions.length === 0) {
+      document.getElementById('page-empty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('page-app').style.display = 'block';
+    renderStats();
+    renderTable();
+    /* Auto-download on first open */
+    downloadExcel();
+  }
+
+  function renderStats() {
+    const n = submissions.length;
+    document.getElementById('stat-count').textContent = n;
+    document.getElementById('stat-latest').textContent = submissions[n-1].timestamp;
+
+    const avgIncome = submissions.reduce((s,x) => s + (x.analysis.totalIncome||0), 0) / n;
+    const avgDebt   = submissions.reduce((s,x) => s + (x.analysis.totalDebtBal||0), 0) / n;
+    document.getElementById('stat-avg-income').textContent = '฿' + fmt(Math.round(avgIncome));
+    document.getElementById('stat-avg-debt').textContent   = '฿' + fmt(Math.round(avgDebt));
+  }
+
+  function renderTable() {
+    const tb = document.getElementById('table-body');
+    tb.innerHTML = submissions.map((s, i) => {
+      const an = s.analysis;
+      const ncfCls = an.NCF >= 0 ? 'pos' : 'neg';
+      const ctxCls = `ctx-${an.context.toLowerCase()}`;
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${s.timestamp}</td>
+        <td><span class="ctx-badge ${ctxCls}">Context ${an.context}</span></td>
+        <td class="num">฿${fmt(an.totalIncome)}</td>
+        <td class="num">฿${fmt(an.livingExp)}</td>
+        <td class="num">฿${fmt(an.sumMinPayment)}</td>
+        <td class="num ${ncfCls}">฿${fmt(an.NCF)}</td>
+        <td class="num">${(+an.dtiPct||0).toFixed(1)}%</td>
+        <td class="num">฿${fmt(an.totalDebtBal)}</td>
+        <td class="num ${an.netWorth >= 0 ? 'pos' : 'neg'}">฿${fmt(an.netWorth)}</td>
+        <td><span class="flag ${s.data.inCollection ? 'flag-yes' : 'flag-no'}">${s.data.inCollection ? 'ใช่' : 'ไม่'}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ── Excel Export ── */
+  function downloadExcel() {
+    const wb = XLSX.utils.book_new();
+
+    /* ── Sheet 1: Summary ── */
+    const summaryData = [
+      ['#','วันที่-เวลา','Session ID','Context','NCF (฿)','รายได้รวม (฿)','ค่าใช้จ่าย (฿)','ยอดผ่อนหนี้/ด. (฿)','DTI%','NCF%','หนี้รวม (฿)','ทรัพย์สินรวม (฿)','ทรัพย์สินสุทธิ (฿)','เงินออมปัจจุบัน (฿)','ออมเพิ่ม/เดือน (฿)','ถูกติดตามหนี้'],
+    ];
+    submissions.forEach((s, i) => {
+      const an = s.analysis;
+      summaryData.push([
+        i+1, s.timestamp, s.id,
+        'Context ' + an.context,
+        an.NCF, an.totalIncome, an.livingExp, an.sumMinPayment,
+        +(+an.dtiPct||0).toFixed(1), +(+an.ncfPct||0).toFixed(1),
+        an.totalDebtBal, an.totalAssetVal, an.netWorth,
+        s.data.savBalance||0, s.data.savMonthly||0,
+        s.data.inCollection ? 'ใช่' : 'ไม่',
+      ]);
+    });
+    appendSheet(wb, summaryData, 'สรุปภาพรวม');
+
+    /* ── Sheet 2: Income ── */
+    const incomeData = [['#','วันที่','Session ID','ลำดับ','ประเภทรายได้','จำนวน (฿/เดือน)']];
+    let rn = 1;
+    submissions.forEach(s => {
+      (s.data.incomes||[]).forEach((inc, j) => {
+        incomeData.push([rn++, s.timestamp, s.id, j+1, INCOME_LABEL[inc.type]||inc.type, inc.amount]);
+      });
+    });
+    appendSheet(wb, incomeData, 'รายได้');
+
+    /* ── Sheet 3: Debts ── */
+    const debtData = [['#','วันที่','Session ID','ลำดับ','ประเภทหนี้','เจ้าหนี้/สถาบัน','ยอดหนี้คงเหลือ (฿)','ยอดผ่อน/ด. (฿)','ดอกเบี้ย (%/ปี)','งวดที่เหลือ (ด.)','ประเภทดอกเบี้ย','ลำดับความสำคัญ']];
+    rn = 1;
+    submissions.forEach(s => {
+      (s.data.debts||[]).forEach((d, j) => {
+        debtData.push([
+          rn++, s.timestamp, s.id, j+1,
+          DEBT_LABEL[d.type]||d.type, d.creditor||'',
+          d.balance, d.monthly,
+          d.interest||'', d.terms||'',
+          d.intType === 'flat' ? 'ดอกเบี้ยคงที่' : 'ลดต้นลดดอก',
+          PRIORITY_LABEL[d.priority] ?? d.priority,
+        ]);
+      });
+    });
+    appendSheet(wb, debtData, 'หนี้สิน');
+
+    /* ── Sheet 4: Expenses ── */
+    const expData = [['#','วันที่','Session ID','ลำดับ','ชื่อค่าใช้จ่าย','หมวดหมู่','จำนวน (฿/เดือน)','ประเภท']];
+    rn = 1;
+    submissions.forEach(s => {
+      (s.data.expenses||[]).forEach((e, j) => {
+        expData.push([rn++, s.timestamp, s.id, j+1, e.name||'', EXP_LABEL[e.category]||e.category, e.amount, e.type === 'fixed' ? 'คงที่' : 'แปรผัน']);
+      });
+    });
+    appendSheet(wb, expData, 'ค่าใช้จ่าย');
+
+    /* ── Sheet 5: Assets ── */
+    const assetData = [['#','วันที่','Session ID','ลำดับ','ชื่อทรัพย์สิน','ประเภท','มูลค่า (฿)']];
+    rn = 1;
+    submissions.forEach(s => {
+      (s.data.assets||[]).forEach((a, j) => {
+        assetData.push([rn++, s.timestamp, s.id, j+1, a.name||'', ASSET_LABEL[a.type]||a.type, a.value]);
+      });
+    });
+    appendSheet(wb, assetData, 'ทรัพย์สิน');
+
+    /* Write file */
+    const dateStr = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `HealthDebt_Report_${dateStr}.xlsx`);
+    showToast('✅ ดาวน์โหลด Excel สำเร็จ');
+  }
+
+  function appendSheet(wb, data, name) {
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    /* Auto column width */
+    const colWidths = data[0].map((_, ci) =>
+      Math.min(40, Math.max(10, ...data.map(r => String(r[ci]||'').length + 2)))
+    );
+    ws['!cols'] = colWidths.map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  }
+
+  /* ── Clear all data ── */
+  function clearData() {
+    if (!confirm(`ลบข้อมูลทั้งหมด ${submissions.length} sessions?\n\nการดำเนินการนี้ไม่สามารถเรียกคืนได้`)) return;
+    localStorage.removeItem('hd_submissions');
+    showToast('🗑️ ลบข้อมูลเรียบร้อยแล้ว');
+    setTimeout(() => location.reload(), 1200);
+  }
+
+  /* ── Toast ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
