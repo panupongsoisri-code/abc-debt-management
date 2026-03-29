@@ -586,7 +586,7 @@
     <div class="logo">⚡</div>
     <div>
       <div class="header-title">HealthDebt</div>
-      <div class="header-subtitle">เครื่องมือวิเคราะห์สุขภาพการเงินส่วนบุคคล</div>
+      <div class="header-subtitle">รู้หนี้ รู้เงิน วางแผนปลดหนี้</div>
     </div>
   </div>
 </header>
@@ -596,22 +596,22 @@
   <!-- Progress Steps -->
   <div class="progress-steps">
     <div class="step-item active" id="snav-1"><div class="step-circle">1</div><div class="step-label">รายได้</div></div>
-    <div class="step-item" id="snav-2"><div class="step-circle">2</div><div class="step-label">ภาระหนี้</div></div>
-    <div class="step-item" id="snav-3"><div class="step-circle">3</div><div class="step-label">ค่าใช้จ่าย</div></div>
-    <div class="step-item" id="snav-4"><div class="step-circle">4</div><div class="step-label">ทรัพย์สิน</div></div>
-    <div class="step-item" id="snav-5"><div class="step-circle">5</div><div class="step-label">ผลวิเคราะห์</div></div>
+    <div class="step-item" id="snav-2"><div class="step-circle">2</div><div class="step-label">หนี้</div></div>
+    <div class="step-item" id="snav-3"><div class="step-circle">3</div><div class="step-label">รายจ่าย</div></div>
+    <div class="step-item" id="snav-4"><div class="step-circle">4</div><div class="step-label">เงินออม</div></div>
+    <div class="step-item" id="snav-5"><div class="step-circle">5</div><div class="step-label">แผนปลดหนี้</div></div>
   </div>
 
   <!-- ═══ STEP 1 : รายได้ ═══ -->
   <div class="step-content active" id="step-1">
     <div class="step-heading">
-      <h2>💼 รายได้ของคุณ</h2>
-      <p>กรอกรายได้ทั้งหมดที่ได้รับต่อเดือน สามารถเพิ่มได้มากกว่า 1 แหล่งที่มา</p>
+      <h2>💼 เงินที่ได้รับต่อเดือน</h2>
+      <p>ใส่รายได้ทั้งหมดที่ได้รับในแต่ละเดือน ถ้ามีหลายทางก็ใส่ได้หลายรายการ</p>
     </div>
     <div class="card">
       <div class="card-header">
         <div class="card-icon blue">💼</div>
-        <div><div class="card-title">แหล่งรายได้</div><div class="card-desc">เงินเดือน ธุรกิจ ค่าเช่า ฟรีแลนซ์ ฯลฯ</div></div>
+        <div><div class="card-title">รายได้ของคุณ</div><div class="card-desc">เงินเดือน ค้าขาย ค่าเช่า งานฟรีแลนซ์ หรืออื่นๆ</div></div>
       </div>
       <div class="card-body">
         <div id="income-list"></div>
@@ -624,26 +624,62 @@
     </div>
     <div class="nav-footer">
       <div></div>
-      <button class="btn btn-primary" onclick="nextStep(1)">ถัดไป &rarr; ภาระหนี้</button>
+      <button class="btn btn-primary" onclick="nextStep(1)">ถัดไป &rarr; กรอกหนี้</button>
     </div>
   </div>
 
   <!-- ═══ STEP 2 : ภาระหนี้ ═══ -->
   <div class="step-content" id="step-2">
     <div class="step-heading">
-      <h2>🏦 ภาระหนี้สิน</h2>
-      <p>กรอกข้อมูลหนี้สินทั้งหมดที่มีอยู่ในปัจจุบัน</p>
+      <h2>🏦 หนี้ที่มีอยู่ตอนนี้</h2>
+      <p>ใส่หนี้ทุกก้อนที่ยังค้างอยู่ ไม่ว่าจะเป็นก้อนเล็กหรือก้อนใหญ่ก็ใส่ได้หมดเลย</p>
+    </div>
+
+    <!-- Phase 0: System Diagnostic — Fatal Error Detection -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon red">🔍</div>
+        <div><div class="card-title">เช็กสัญญาณอันตรายก่อนนะ</div>
+        <div class="card-desc">ถ้าเข้าข่ายข้อใดข้อหนึ่ง ระบบจะแจ้งเตือนเพื่อช่วยให้คุณหยุดวงจรนี้ได้ทัน</div></div>
+      </div>
+      <div class="card-body">
+        <div id="force-shield-alert" style="display:none; margin-bottom:14px; padding:14px 16px; background:var(--danger-bg); border:2px solid var(--danger); border-radius:var(--radius-sm);">
+          <div style="font-size:15px; font-weight:600; color:#b71c2c; margin-bottom:4px;">⚠️ สัญญาณอันตราย — ห้ามกู้เพิ่มอีกเด็ดขาด!</div>
+          <div style="font-size:13px; color:#b71c2c; font-weight:300;">คุณกำลังอยู่ในวงจรที่ทำให้หนี้โตขึ้นเรื่อยๆ <strong>ห้ามกู้เงินใหม่ทุกรูปแบบ</strong> ไม่ว่าจะบัตรเครดิต บัตรกด หรือสินเชื่อใดก็ตาม ต้องหยุดก่อน แล้วทำตามแผนด้านล่าง</div>
+        </div>
+        <label class="check-option" onclick="updateDiagnostic()">
+          <input type="checkbox" id="chk-err1">
+          <div>
+            <div class="check-option-text">ผ่อนมานานมากแล้ว แต่ยอดหนี้แทบไม่ลดเลย</div>
+            <div class="check-option-sub">จ่ายไปทุกเดือนแต่เหมือนดอกเบี้ยกินหมด ยอดต้นแทบไม่ขยับ</div>
+          </div>
+        </label>
+        <label class="check-option" onclick="updateDiagnostic()">
+          <input type="checkbox" id="chk-err2">
+          <div>
+            <div class="check-option-text">จ่ายค่างวดแล้ว กดเงินสดกลับมาใช้อีก</div>
+            <div class="check-option-sub">ใช้บัตรกดเงินสดหรือวงเงินบัตรเครดิตหมุนจ่ายค่างวดตัวเอง</div>
+          </div>
+        </label>
+        <label class="check-option" onclick="updateDiagnostic()">
+          <input type="checkbox" id="chk-err3">
+          <div>
+            <div class="check-option-text">เคยกู้เงินใหม่ หรือเปิดบัตรใหม่ เพื่อเอาไปจ่ายหนี้เก่า</div>
+            <div class="check-option-sub">กู้มาหมุน — เอาหนี้ใหม่มาจ่ายหนี้เก่า วนไปเรื่อยๆ</div>
+          </div>
+        </label>
+      </div>
     </div>
 
     <div class="info-box blue">
       <span>ℹ️</span>
-      <span>กรอกหนี้ทุกประเภท — บัตรเครดิต สินเชื่อบ้าน สินเชื่อรถ หนี้นอกระบบ ฯลฯ ระบบจะจัดลำดับความสำคัญให้อัตโนมัติตาม Algorithm</span>
+      <span>ใส่หนี้ให้ครบทุกก้อน ไม่ว่าจะเป็นบัตรเครดิต สินเชื่อบ้าน รถ หรือหนี้นอกระบบ ระบบจะจัดลำดับว่าต้องแก้ก้อนไหนก่อนให้เอง</span>
     </div>
 
     <div class="card">
       <div class="card-header">
         <div class="card-icon blue">🏦</div>
-        <div><div class="card-title">รายการหนี้สิน</div><div class="card-desc">ระบบจะจัดลำดับ Priority 0–3 ให้อัตโนมัติตามประเภทหนี้</div></div>
+        <div><div class="card-title">หนี้แต่ละก้อน</div><div class="card-desc">ใส่ทุกก้อนที่ยังค้างอยู่ ระบบจะจัดให้ว่าต้องโปะก้อนไหนก่อน</div></div>
       </div>
       <div class="card-body">
         <div id="debt-list"></div>
@@ -665,14 +701,14 @@
     <div class="card">
       <div class="card-header">
         <div class="card-icon red">⚫</div>
-        <div><div class="card-title">สถานะการทวงถาม</div><div class="card-desc">สำหรับเลือก Context ที่เหมาะสมในการวิเคราะห์</div></div>
+        <div><div class="card-title">ถูกทวงหนี้อยู่ตอนนี้ไหม?</div><div class="card-desc">ช่วยให้เราแนะนำแผนที่ตรงกับสถานการณ์ของคุณมากขึ้น</div></div>
       </div>
       <div class="card-body">
         <label class="check-option">
           <input type="checkbox" id="chk-collection">
           <div>
-            <div class="check-option-text">⚫ ขณะนี้ถูกทวงถาม หรืออยู่ระหว่างกระบวนการฟ้องร้อง</div>
-            <div class="check-option-sub">เจ้าหนี้ติดต่อมาเป็นประจำ หรือได้รับหมายศาลแล้ว</div>
+            <div class="check-option-text">⚫ ตอนนี้มีเจ้าหนี้ทวงถาม หรือได้รับหมายศาลแล้ว</div>
+            <div class="check-option-sub">เจ้าหนี้โทรมาบ่อย หรือมีจดหมายเรียกชำระ / หมายศาล</div>
           </div>
         </label>
       </div>
@@ -687,17 +723,17 @@
   <!-- ═══ STEP 3 : ค่าใช้จ่าย ═══ -->
   <div class="step-content" id="step-3">
     <div class="step-heading">
-      <h2>🛒 ค่าใช้จ่ายในการดำรงชีวิต</h2>
-      <p>กรอก Living Expenses — ค่าใช้จ่ายที่จำเป็นต่อชีวิต <strong>ไม่รวม</strong>ยอดผ่อนหนี้</p>
+      <h2>🛒 รายจ่ายประจำเดือน</h2>
+      <p>ค่าใช้จ่ายที่ต้องจ่ายทุกเดือน เช่น ค่าข้าว ค่าเช่า ค่าน้ำไฟ — <strong>ไม่ต้องรวม</strong>ค่าผ่อนหนี้ที่กรอกไปแล้ว</p>
     </div>
     <div class="info-box yellow">
       <span>💡</span>
-      <span>Algorithm ใช้ตัวเลขนี้เป็น <strong>Living_Expenses</strong> เพื่อคำนวณ NCF = รายได้ − ค่าครองชีพ − ยอดผ่อนหนี้ทั้งหมด</span>
+      <span>ระบบจะเอาตัวเลขนี้ไปคำนวณว่า แต่ละเดือนคุณมี <strong>เงินเหลือเท่าไร</strong> หลังหักค่าใช้จ่ายและหนี้ทุกก้อน</span>
     </div>
     <div class="card">
       <div class="card-header">
         <div class="card-icon orange">🛒</div>
-        <div><div class="card-title">รายการค่าใช้จ่าย</div><div class="card-desc">ไม่รวมยอดผ่อนหนี้ที่กรอกในขั้นตอนที่ 2</div></div>
+        <div><div class="card-title">รายจ่ายของคุณ</div><div class="card-desc">ค่าใช้จ่ายประจำ ไม่รวมค่าผ่อนหนี้ที่กรอกในขั้นตอนที่ 2</div></div>
       </div>
       <div class="card-body">
         <div id="expense-list"></div>
@@ -717,13 +753,13 @@
   <!-- ═══ STEP 4 : ทรัพย์สิน (Optional) ═══ -->
   <div class="step-content" id="step-4">
     <div class="step-heading">
-      <h2>🏠 ทรัพย์สินและเงินออม <span class="opt-badge">ไม่บังคับ</span></h2>
-      <p>ข้อมูลส่วนนี้ใช้คำนวณ Net Worth และ Haircut Fund ในกรณีที่จำเป็น</p>
+      <h2>🏠 เงินออมและสิ่งที่มี <span class="opt-badge">ไม่บังคับ</span></h2>
+      <p>ถ้ามีเงินเก็บหรือทรัพย์สิน ใส่ได้เลย จะช่วยให้แผนแม่นขึ้น ถ้าไม่มีก็ข้ามได้</p>
     </div>
     <div class="card">
       <div class="card-header">
         <div class="card-icon green">💰</div>
-        <div><div class="card-title">เงินออมและสภาพคล่อง</div><div class="card-desc">เงินสด บัญชีออมทรัพย์ และการออมต่อเดือน</div></div>
+        <div><div class="card-title">เงินสดและเงินออม</div><div class="card-desc">เงินในบัญชี เงินสดที่มีอยู่ และที่ออมได้ต่อเดือน</div></div>
       </div>
       <div class="card-body">
         <div class="form-grid">
@@ -741,7 +777,7 @@
     <div class="card">
       <div class="card-header">
         <div class="card-icon purple">🏠</div>
-        <div><div class="card-title">ทรัพย์สินอื่นๆ <span class="opt-badge">ไม่บังคับ</span></div><div class="card-desc">อสังหาริมทรัพย์ รถยนต์ หุ้น กองทุน</div></div>
+        <div><div class="card-title">สิ่งที่มีมูลค่า <span class="opt-badge">ไม่บังคับ</span></div><div class="card-desc">บ้าน รถ หุ้น กองทุน ทอง หรือสิ่งของที่ขายแล้วได้เงินได้</div></div>
       </div>
       <div class="card-body">
         <div id="asset-list"></div>
@@ -755,8 +791,8 @@
     <div class="nav-footer">
       <button class="btn btn-secondary" onclick="prevStep(4)">&larr; ย้อนกลับ</button>
       <div style="display:flex; align-items:center; gap:14px;">
-        <button class="skip-link" onclick="doAnalyze()">ข้ามและวิเคราะห์</button>
-        <button class="btn btn-success" onclick="doAnalyze()">🔍 วิเคราะห์การเงิน</button>
+        <button class="skip-link" onclick="doAnalyze()">ข้ามส่วนนี้ ดูผลได้เลย</button>
+        <button class="btn btn-success" onclick="doAnalyze()">🔍 ดูแผนปลดหนี้ของฉัน</button>
       </div>
     </div>
   </div>
@@ -764,8 +800,8 @@
   <!-- ═══ STEP 5 : ผลการวิเคราะห์ ═══ -->
   <div class="step-content" id="step-5">
     <div class="step-heading">
-      <h2>📊 ผลการวิเคราะห์สุขภาพการเงิน</h2>
-      <p>วิเคราะห์ตาม Debt Management Algorithm — NCF Routing + Debt Priority</p>
+      <h2>📊 แผนปลดหนี้ของคุณ</h2>
+      <p>ดูผลวิเคราะห์และขั้นตอนที่ต้องทำต่อจากนี้ตามสถานการณ์จริงของคุณ</p>
     </div>
     <div id="results-content"></div>
     <div class="nav-footer" style="margin-top:28px;">
@@ -1006,6 +1042,11 @@
       savBalance: fnum2('sav-balance'),
       savMonthly: fnum2('sav-monthly'),
       inCollection: document.getElementById('chk-collection').checked,
+      errors: {
+        minOnly:   !!document.getElementById('chk-err1')?.checked,
+        cashCycle: !!document.getElementById('chk-err2')?.checked,
+        newDebt:   !!document.getElementById('chk-err3')?.checked,
+      },
     };
   }
 
@@ -1091,19 +1132,27 @@
     const dtiPct = totalIncome > 0 ? (sumMinPayment / totalIncome) * 100 : 0;
     const expPct = totalIncome > 0 ? (livingExp / totalIncome) * 100 : 0;
 
-    // [3] Sort by Priority (0=Critical first)
+    // [3] Sort by Priority (0=Critical first) — used for the risk/urgency table
     const sortedDebts = [...d.debts].sort((a,b) => a.priority - b.priority);
 
-    // Avalanche: target highest interest debt first (Context A — Action 2)
-    const withInt       = d.debts.filter(x => x.interest > 0 && x.balance > 0);
-    const avalancheTarget = withInt.length > 0
-      ? [...withInt].sort((a,b) => b.interest - a.interest)[0]
-      : (d.debts.filter(x => x.balance > 0).sort((a,b) => b.monthly - a.monthly)[0] || null);
+    // Phase 0: System Diagnostic — Fatal Error detection
+    const forceShield = !!(d.errors && (d.errors.minOnly || d.errors.cashCycle || d.errors.newDebt));
 
-    // Snowball: target lowest balance debt first (Context A — Action 2)
-    const snowballTarget = d.debts.filter(x => x.balance > 0).length > 0
-      ? [...d.debts].filter(x => x.balance > 0).sort((a,b) => a.balance - b.balance)[0]
-      : null;
+    // Phase 3: Advanced Debt Sorting Engine — Payment Queue
+    // Priority #1 (Critical Override): Quick Win — balance closeable in 1–2 months with NCF
+    const activeDebts = d.debts.filter(x => x.balance > 0);
+    const quickWinDebts = NCF > 0
+      ? activeDebts.filter(x => x.balance <= NCF * 2).sort((a,b) => a.balance - b.balance)
+      : [];
+    const quickWinIds = new Set(quickWinDebts.map((_, i) => quickWinDebts[i]));
+    // Priority #2 & #3: remaining debts — sort by highest interest first, then lowest balance
+    const restDebts = activeDebts
+      .filter(x => !(NCF > 0 && x.balance <= NCF * 2))
+      .sort((a,b) => {
+        if (b.interest !== a.interest) return b.interest - a.interest;
+        return a.balance - b.balance;
+      });
+    const paymentQueue = [...quickWinDebts, ...restDebts];
 
     // [4] Context Routing
     let context;
@@ -1125,7 +1174,7 @@
 
     return {
       context, NCF, ncfPct, totalIncome, livingExp, sumMinPayment,
-      dtiPct, expPct, sortedDebts, avalancheTarget, snowballTarget,
+      dtiPct, expPct, sortedDebts, paymentQueue, forceShield,
       totalDebtBal, totalAssetVal, netWorth, pri2Monthly, hiInterestDebts,
       savBalance: d.savBalance, savMonthly: d.savMonthly,
     };
@@ -1145,26 +1194,38 @@
     html += `
       <div class="ncf-box">
         <div class="ncf-card">
-          <div class="ncf-label">Total Income</div>
+          <div class="ncf-label">เงินเข้าต่อเดือน</div>
           <div class="ncf-value pos">฿${fm(an.totalIncome)}</div>
-          <div class="ncf-sub">${d.incomes.length} แหล่งรายได้/เดือน</div>
+          <div class="ncf-sub">${d.incomes.length} แหล่งรายได้</div>
         </div>
         <div class="ncf-card">
-          <div class="ncf-label">Living Expenses</div>
+          <div class="ncf-label">ค่าใช้จ่ายประจำ</div>
           <div class="ncf-value neg">฿${fm(an.livingExp)}</div>
-          <div class="ncf-sub">ค่าครองชีพรายเดือน</div>
+          <div class="ncf-sub">รายจ่ายต่อเดือน (ไม่รวมหนี้)</div>
         </div>
         <div class="ncf-card">
-          <div class="ncf-label">Sum(Min_Payment)</div>
+          <div class="ncf-label">ผ่อนหนี้ทุกก้อนรวม</div>
           <div class="ncf-value neg">฿${fm(an.sumMinPayment)}</div>
-          <div class="ncf-sub">ยอดผ่อนหนี้ทั้งหมด/เดือน</div>
+          <div class="ncf-sub">ยอดผ่อนขั้นต่ำต่อเดือน</div>
         </div>
         <div class="ncf-card highlight">
-          <div class="ncf-label">= NCF</div>
+          <div class="ncf-label">= เงินคงเหลือต่อเดือน</div>
           <div class="ncf-value ${ncfColor}">฿${fm(an.NCF)}</div>
           <div class="ncf-sub">${an.ncfPct >= 0 ? '+' : ''}${an.ncfPct.toFixed(1)}% ของรายได้</div>
         </div>
       </div>`;
+
+    /* ── Force Shield Banner (Phase 0) ── */
+    if (an.forceShield) {
+      html += `
+        <div style="padding:16px 20px; background:var(--danger-bg); border:2px solid var(--danger); border-radius:var(--radius); margin-bottom:4px; display:flex; gap:14px; align-items:flex-start;">
+          <div style="font-size:28px; flex-shrink:0;">🛡️</div>
+          <div>
+            <div style="font-size:16px; font-weight:600; color:#b71c2c; margin-bottom:4px;">⚠️ สัญญาณอันตราย — ห้ามกู้เพิ่มอีกเด็ดขาด!</div>
+            <div style="font-size:13px; color:#b71c2c; font-weight:300;">คุณกำลังอยู่ในวงจรที่ทำให้หนี้โตขึ้นเรื่อยๆ การกู้เงินใหม่ทุกรูปแบบจะทำให้สถานการณ์หนักขึ้นอีก ให้ทำตามแผนด้านล่างโดย<strong>ไม่กู้เพิ่มอีกโดยเด็ดขาด</strong></div>
+          </div>
+        </div>`;
+    }
 
     /* ── Context Banner ── */
     html += renderContextBanner(an);
@@ -1178,20 +1239,20 @@
       <div class="card">
         <div class="card-header">
           <div class="card-icon blue">📊</div>
-          <div><div class="card-title">การจัดสรรรายได้ต่อเดือน</div>
-          <div class="card-desc">NCF = รายได้ − ค่าครองชีพ − ยอดผ่อนหนี้รวม</div></div>
+          <div><div class="card-title">เงินแต่ละเดือนของคุณไปไหนบ้าง?</div>
+          <div class="card-desc">รายได้ − รายจ่ายประจำ − ผ่อนหนี้ = เงินที่เหลือ</div></div>
         </div>
         <div class="card-body">
           <div class="pb-wrap">
-            <div class="pb-label"><span>ค่าครองชีพ (Living Expenses)</span><span>฿${fm(an.livingExp)} — ${expBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>ค่าใช้จ่ายประจำ</span><span>฿${fm(an.livingExp)} — ${expBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill orange" style="width:${expBar}%"></div></div>
           </div>
           <div class="pb-wrap">
-            <div class="pb-label"><span>ยอดผ่อนหนี้ Sum(Min_Payment)</span><span>฿${fm(an.sumMinPayment)} — ${dtiBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>ผ่อนหนี้ทุกก้อนรวม</span><span>฿${fm(an.sumMinPayment)} — ${dtiBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill ${dtiCol}" style="width:${dtiBar}%"></div></div>
           </div>
           <div class="pb-wrap">
-            <div class="pb-label"><span>NCF คงเหลือ</span><span>฿${fm(Math.max(0,an.NCF))} — ${ncfBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>เงินที่เหลือต่อเดือน</span><span>฿${fm(Math.max(0,an.NCF))} — ${ncfBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill green" style="width:${ncfBar}%"></div></div>
           </div>
         </div>
@@ -1203,14 +1264,14 @@
         <div class="card">
           <div class="card-header">
             <div class="card-icon blue">🏦</div>
-            <div><div class="card-title">ลำดับความสำคัญหนี้ — Debt Priority</div>
-            <div class="card-desc">จัดเรียงตาม Algorithm [3]: 0=วิกฤติ → 3=ต่ำ | ยอดหนี้รวม ฿${fm(an.totalDebtBal)}</div></div>
+            <div><div class="card-title">หนี้ทั้งหมดที่มีอยู่</div>
+            <div class="card-desc">ยอดหนี้รวม ฿${fm(an.totalDebtBal)} — เรียงตามความเร่งด่วนที่ต้องจัดการ</div></div>
           </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th>Priority</th><th>ประเภทหนี้</th><th>เจ้าหนี้</th>
-                <th>ยอดคงเหลือ</th><th>ผ่อน/เดือน</th><th>ดอกเบี้ย/ปี</th>
+                <th>ความเร่งด่วน</th><th>ประเภทหนี้</th><th>เจ้าหนี้</th>
+                <th>ยอดที่ค้างอยู่</th><th>ผ่อน/เดือน</th><th>ดอกเบี้ย/ปี</th>
               </tr></thead>
               <tbody>
                 ${an.sortedDebts.map(x => {
@@ -1241,7 +1302,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-icon orange">🛒</div>
-            <div><div class="card-title">รายละเอียด Living Expenses</div>
+            <div><div class="card-title">รายจ่ายประจำของคุณ</div>
             <div class="card-desc">รวม ฿${fm(an.livingExp)} / เดือน</div></div>
           </div>
           <div class="table-wrap">
@@ -1267,24 +1328,24 @@
         <div class="card">
           <div class="card-header">
             <div class="card-icon green">💰</div>
-            <div><div class="card-title">ทรัพย์สินสุทธิ (Net Worth)</div>
-            <div class="card-desc">ทรัพย์สินรวม − หนี้สินรวม</div></div>
+            <div><div class="card-title">สรุปทรัพย์สินและหนี้</div>
+            <div class="card-desc">ถ้าเอาสิ่งที่มีทั้งหมดมาหักหนี้ทั้งหมด จะเหลือเท่าไร</div></div>
           </div>
           <div class="card-body">
             <div class="form-grid">
               <div>
-                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">ทรัพย์สินรวม</div>
+                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">สิ่งที่มีทั้งหมด</div>
                 <div style="font-size:24px;font-weight:700;color:var(--success);">฿${fm(totalA)}</div>
-                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">เงินออม + สินทรัพย์อื่น</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">เงินออม + สินทรัพย์อื่นๆ</div>
               </div>
               <div>
-                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">หนี้สินรวม</div>
+                <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">หนี้ที่ยังค้างอยู่</div>
                 <div style="font-size:24px;font-weight:700;color:var(--danger);">฿${fm(an.totalDebtBal)}</div>
-                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">ยอดหนี้คงเหลือทั้งหมด</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">ยอดหนี้รวมทั้งหมด</div>
               </div>
             </div>
             <div class="nw-row">
-              <div class="nw-label">Net Worth</div>
+              <div class="nw-label">ทรัพย์สินสุทธิ</div>
               <div class="nw-value" style="color:${an.netWorth>=0?'var(--success)':'var(--danger)'};">
                 ${an.netWorth<0?'−':''}฿${fm(Math.abs(an.netWorth))}
               </div>
@@ -1302,49 +1363,49 @@
   function renderContextBanner(an) {
     const ctx = {
       A: {
-        color:'green', emoji:'🟢', tag:'Context A',
-        title:'สภาพคล่องเป็นบวก — NCF > 0',
-        sub:'จ่ายขั้นต่ำได้ครบและยังมีเงินเหลือ สามารถเร่งชำระหนี้ได้',
-        rule:'หลักการ: รักษา Credit Score + โจมตีหนี้ด้วย NCF ที่เหลือ (Avalanche หรือ Snowball)',
+        color:'green', emoji:'🟢', tag:'สถานะ: มีเงินเหลือ',
+        title:'ดีมาก! คุณยังมีเงินเหลือหลังจ่ายหนี้ทุกก้อน',
+        sub:'จ่ายขั้นต่ำได้ครบและยังมีเงินเหลือ ถึงเวลาเร่งปิดหนี้ได้เลย',
+        rule:'หัวใจสำคัญ: เงินที่เหลือทุกบาท โปะหนี้ก้อนเดียวก่อน ห้ามแบ่งหลายก้อน',
         actions: [
-          { t:'จ่าย Min_Payment ทุกก้อนอัตโนมัติ', d:'ชำระยอดขั้นต่ำของหนี้ทุกรายการตรงเวลา เพื่อรักษา Credit Score ไม่ให้เสียหาย ห้ามข้ามการจ่ายแม้แต่ก้อนเดียว' },
-          { t:'โจมตีหนี้ก้อนเป้าหมายด้วย NCF ที่เหลือ', d:'นำ NCF ทั้งหมดที่เหลือหลังจ่ายขั้นต่ำ ไปชำระหนี้เพิ่มเติมตามกลยุทธ์ที่เลือก (ดูด้านล่าง)' },
-          { t:'วนซ้ำจนกว่า Debt Array จะว่าง', d:'เมื่อหนี้ก้อนหนึ่งหมด ให้โอน Min_Payment + NCF ของก้อนนั้น ไปโจมตีก้อนถัดไปตามลำดับ (Debt Snowball Roll-over)' },
+          { t:'ขั้น 1: จ่ายขั้นต่ำทุกก้อนให้ครบทุกเดือน', d:'จ่ายยอดขั้นต่ำของหนี้ทุกรายการให้ตรงเวลา เพื่อรักษาประวัติการชำระ ห้ามข้ามแม้แต่ก้อนเดียว' },
+          { t:`ขั้น 2: เงินที่เหลือ ฿${fm(an.NCF)} ทุ่มโปะหนี้อันดับ 1 เพียงก้อนเดียว`, d:'เอาเงินที่เหลือทั้งหมดหลังจ่ายขั้นต่ำ ไปโปะหนี้ก้อนที่อยู่อันดับ 1 ในตารางด้านล่างเท่านั้น ห้ามแบ่งจ่ายหลายก้อนพร้อมกัน' },
+          { t:'ขั้น 3: พอปิดก้อนนั้นแล้ว เอาเงินทั้งหมดไปโปะก้อนถัดไป', d:'เมื่อหนี้ก้อนแรกหมดแล้ว เอาเงินก้อนนั้นทั้งหมดบวกกับเงินที่เหลือ ไปโปะหนี้ก้อนที่ 2 แล้ววนแบบนี้ไปเรื่อยๆ จนหมดหนี้' },
         ],
       },
       B: {
-        color:'orange', emoji:'🟡', tag:'Context B',
-        title:'สภาพคล่องปริ่มน้ำ — NCF ≈ 0 หรือติดลบเล็กน้อย',
-        sub:'เริ่มหมุนเงินไม่ทัน ตึงมือ ต้องปรับสมดุลก่อนเพื่อดันให้ NCF กลับมาเป็นบวก',
-        rule:'หลักการ: ลดรายจ่าย + หารายได้เพิ่ม + พิจารณารวมหนี้เพื่อเปิด NCF',
+        color:'orange', emoji:'🟡', tag:'สถานะ: เงินเกือบไม่พอ',
+        title:'เริ่มตึงแล้ว เงินเกือบไม่พอจ่ายหนี้ทุกก้อน',
+        sub:'เดือนชนเดือน ต้องหาทางให้มีเงินเหลือก่อน แล้วค่อยเร่งปิดหนี้',
+        rule:'หัวใจสำคัญ: ลดรายจ่าย หารายได้เพิ่ม ลองขอรวมหนี้ แต่ห้ามกู้ใหม่เด็ดขาด',
         actions: [
-          { t:'ตัดรายจ่ายแปรผันที่ไม่จำเป็นออกทันที', d:'ตรวจสอบ Living_Expenses และตัดค่าใช้จ่ายแปรผัน (บันเทิง ไลฟ์สไตล์) ออกก่อน เป้าหมายคือเพิ่ม NCF ให้กลับมาเป็นบวก' },
-          { t:'หาทางเพิ่ม Total_Income', d:'รับงานพิเศษ ฟรีแลนซ์ หรือขายสินทรัพย์ที่ไม่จำเป็น เพื่อเพิ่มรายได้เข้าสมการ NCF' },
-          { t:'พิจารณา Debt Consolidation หรือ Refinance', d:'ตรวจสอบว่าการรวมหนี้ดอกเบี้ยสูงเข้าด้วยกัน จะทำให้ Sum(Min_Payment) ลดลงหรือไม่ ถ้า NCF กลับมา > 0 ให้เข้าสู่ Context A' },
-          { t:'ห้ามกู้หมุนเพื่อชำระหนี้เก่า', d:'ห้ามสร้างหนี้ใหม่เพื่อมาจ่ายหนี้เก่าโดยเด็ดขาด (Halt the Cycle) จะทำให้ภาระหนี้สะสมจนเข้าสู่ Context C' },
+          { t:'ขั้น 1: ตัดรายจ่ายที่ไม่จำเป็นออกทันที และหาเงินเพิ่ม', d:'ดูค่าใช้จ่ายทีละรายการ และตัดที่ไม่จำเป็นออก เช่น ค่าบันเทิง ค่าสมาชิกต่างๆ พร้อมกันนี้ให้หางานพิเศษหรือขายของเพิ่มรายได้ เพื่อให้มีเงินเหลือหลังจ่ายหนี้' },
+          { t:'ขั้น 2: ลองขอรวมหนี้ทุกก้อนเป็นก้อนเดียวที่ผ่อนน้อยลง', d:'ติดต่อธนาคารหรือสถาบันการเงินเพื่อขอรวมหนี้ทั้งหมดเป็นสินเชื่อก้อนเดียว ยอดผ่อนต่อเดือนจะลดลง ทำให้มีเงินเหลือมากขึ้น' },
+          { t:'ขั้น 3: ห้ามกู้เงินใหม่มาจ่ายหนี้เก่าเด็ดขาด', d:'ระหว่างรอผล ห้ามเปิดบัตรใหม่ กู้เงินใหม่ หรือกดเงินสดมาหมุนจ่ายหนี้เก่า เพราะจะทำให้หนี้โตขึ้นเรื่อยๆ จนจ่ายไม่ไหว' },
+          { t:'✅ พอมีเงินเหลือแล้ว ทำตามแผนสถานะ "มีเงินเหลือ" ได้เลย', d:'เมื่อรวมหนี้สำเร็จหรือลดรายจ่ายได้จนมีเงินเหลือทุกเดือน ให้กลับมาทำตามขั้น 1–3 ของสถานะ "มีเงินเหลือ" ได้ทันที' },
         ],
       },
       C: {
-        color:'red', emoji:'🔴', tag:'Context C',
-        title:'สภาพคล่องติดลบหนัก — NCF < 0',
-        sub:'จ่ายขั้นต่ำไม่ได้แล้ว ต้องรักษาสภาพคล่องก่อนเป็นอันดับแรก',
-        rule:'หลักการ: Liquidity is King — ดำรงชีวิตได้ก่อน แล้วค่อยเจรจาปรับโครงสร้างหนี้',
+        color:'red', emoji:'🔴', tag:'สถานะ: ยากมาก ขาดเงินหนัก',
+        title:'ตอนนี้หนักมาก เงินไม่พอจ่ายหนี้ทุกก้อน',
+        sub:'ต้องดูแลตัวเองให้อยู่รอดก่อน แล้วค่อยเจรจากับเจ้าหนี้ทีละขั้น',
+        rule:'หัวใจสำคัญ: ชีวิตต้องอยู่ได้ก่อน อย่าเอาเงินสุดท้ายไปจ่ายหนี้จนตัวเองไม่มีกิน',
         actions: [
-          { t:'รักษา Survival Cash Flow', d:`ใช้เงิน Total_Income − Living_Expenses (฿${fm(Math.max(0, an.totalIncome - an.livingExp))}/เดือน) ไว้กับตัวเพื่อดำรงชีวิต อย่านำเงินก้อนสุดท้ายไปชำระหนี้จนตัวเองขาดสภาพคล่อง` },
-          { t:'ติดต่อเจ้าหนี้เพื่อขอปรับโครงสร้างหนี้', d:'เจรจาขอ: พักชำระต้น (จ่ายเฉพาะดอก), ลดอัตราดอกเบี้ย, ยืดระยะเวลาผ่อน หรือขอ Moratorium ชั่วคราว' },
-          { t:'สะสม Haircut Fund จากหนี้ Priority 2', d:`หากเจรจาไม่สำเร็จ หยุดชำระหนี้ไม่มีหลักประกัน (Priority 2) แล้วนำเงิน ฿${fm(an.pri2Monthly)}/เดือนที่ประหยัดได้ สะสมเป็น Haircut Fund เพื่อต่อรองในภายหลัง` },
-          { t:'ใช้ Haircut Fund ต่อรองลดหนี้โดยตรง', d:'เมื่อเจ้าหนี้เสนอส่วนลด (Haircut) ให้นำเงินก้อนที่สะสมไว้มายื่นข้อเสนอชำระครั้งเดียว เพื่อปิดหนี้ในราคาที่ต่ำกว่ายอดเต็ม' },
+          { t:'ขั้น 1: ถ้าจะใช้เงินเก็บ ห้ามเอาออกทั้งหมด', d:`ถ้าต้องเอาเงินเก็บ ฿${fm(an.savBalance)} มาใช้ ให้เอาได้ไม่เกินครึ่ง (ประมาณ ฿${fm(Math.round(an.savBalance * 0.45))}) เพื่อปิดหนี้ก้อนเล็กสุดก่อน เงินที่เหลืออีกครึ่งต้องเก็บไว้กินข้าว-ใช้ชีวิตต่อ ห้ามเอาออกหมดเด็ดขาด` },
+          { t:'ขั้น 2: โทรหาเจ้าหนี้ ขอผ่อนผันหรือยืดเวลา', d:'ติดต่อเจ้าหนี้แต่ละรายเพื่อขอ: จ่ายเฉพาะดอกก่อน, ขอลดดอกเบี้ย, ขอยืดเวลาผ่อน หรือขอหยุดพักชำระชั่วคราว เจ้าหนี้ส่วนใหญ่ยอมเจรจาถ้าเราโทรหาก่อน' },
+          { t:'ขั้น 3: ถ้าหนักมากจริงๆ ให้หยุดจ่ายบัตรเครดิตก่อน และเก็บเงินนั้นไว้', d:`ถ้าเจรจาไม่สำเร็จและไม่มีเงินกินข้าว ให้หยุดจ่ายบัตรเครดิตและบัตรกดเงินสดก่อน (ยังไม่ต้องหยุดจ่ายบ้านหรือรถ) เอาเงิน ฿${fm(an.pri2Monthly)}/เดือนที่ประหยัดได้ เก็บสะสมไว้เพื่อใช้ต่อรองปิดหนี้ในราคาลดในอนาคต` },
+          { t:'ขั้น 4: ใช้เงินที่เก็บสะสมไว้ต่อรองปิดหนี้ในราคาลด', d:'เมื่อเจ้าหนี้เสนอราคาพิเศษให้ปิดหนี้ครั้งเดียว ให้เอาเงินที่สะสมไว้ยื่นเจรจาปิดจบในราคาที่ต่ำกว่ายอดหนี้จริง' },
         ],
       },
       D: {
-        color:'black', emoji:'⚫', tag:'Context D',
-        title:'เข้าสู่กระบวนการทวงถามหรือขั้นศาล (Collection & Legal Process)',
-        sub:'ผิดนัดชำระจนมีการติดตามทวงถาม — ต้องร่วมมือและใช้สิทธิ์ทางกฎหมายอย่างถูกต้อง',
-        rule:'หลักการ: ร่วมมือเสมอ + ไปศาลทุกนัด + ใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา',
+        color:'black', emoji:'⚫', tag:'สถานะ: ถูกทวงหนี้หรือโดนฟ้อง',
+        title:'ถูกทวงหนี้หรือได้รับหมายศาลแล้ว — ต้องจัดการทันที',
+        sub:'อย่าหนีสาย อย่าหนีศาล — ยิ่งร่วมมือเร็ว ยิ่งมีโอกาสต่อรองได้มากกว่า',
+        rule:'หัวใจสำคัญ: รับสายทุกครั้ง ไปศาลทุกนัด ขอไกล่เกลี่ยในชั้นศาล',
         actions: [
-          { t:'รับสายและสื่อสารกับเจ้าหน้าที่ทวงถามเสมอ', d:'การให้ความร่วมมือจะช่วยป้องกันไม่ให้ระบบ Auto-Dialer หรือ Agent Workspace ของฝั่งเจ้าหนี้บันทึกล็อกสถานะว่าเรามี "เจตนาหลบหนี้ (Skip Tracing)" ซึ่งจะส่งผลให้การเจรจาขอยกเว้นดอกเบี้ยปรับในอนาคตยากขึ้น' },
-          { t:'ต้องไปศาลตามนัดทุกครั้ง', d:'หากเรื่องถึงขั้นตอนการฟ้องร้อง ต้องไปศาลตามนัดทุกครั้งโดยไม่ขาดนัด เพราะสิทธิ์ในการต่อสู้คดีและเจรจาจะหมดไปหากไม่ปรากฏตัว' },
-          { t:'ใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา', d:`ใช้สิทธิ์ในการไกล่เกลี่ยต่อหน้าผู้พิพากษา เพื่อขอลดหย่อนค่าธรรมเนียม ดอกเบี้ยปรับ และตกลงยอดผ่อนชำระใหม่ที่สอดคล้องกับ NCF ที่แท้จริงของเรา (฿${fm(Math.max(0, an.NCF))}/เดือน)` },
+          { t:'ขั้น 1: รับสายเจ้าหนี้ทุกครั้ง อย่าหนีสาย', d:'บอกสถานการณ์จริงว่าตอนนี้มีเงินเหลือเท่าไรต่อเดือน การรับสายและพูดคุยจะทำให้เจ้าหนี้ยินดีเจรจาลดดอกเบี้ยหรือยืดเวลาได้ง่ายขึ้น ถ้าหนีสายจะยิ่งเสียโอกาสต่อรอง' },
+          { t:'ขั้น 2: ถ้าได้รับหมายศาล ต้องไปศาลทุกนัด', d:'ห้ามขาดนัดศาลเด็ดขาด เพราะถ้าไม่ไปศาล สิทธิ์ในการต่อสู้คดีและเจรจาจะหมดไปทันที และอาจถูกยึดทรัพย์สินโดยไม่มีโอกาสแก้ตัว' },
+          { t:`ขั้น 3: ใช้สิทธิ์ขอไกล่เกลี่ยในชั้นศาล`, d:`เมื่อไปศาล ขอใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา เพื่อขอลดดอกเบี้ยผิดนัด และตกลงยอดผ่อนใหม่ที่คุณจ่ายได้จริง ตามเงินที่มีอยู่` },
         ],
       },
     }[an.context];
@@ -1354,7 +1415,7 @@
     let actionsHtml = ctx.actions.map((a,i) => `
       <li class="action-item ${ac}">
         <div class="action-num">${i+1}</div>
-        <div class="action-text"><strong>${a.t}</strong>${a.d}</div>
+        <div class="action-text"><strong>${a.t}</strong><br>${a.d}</div>
       </li>`).join('');
 
     return `
@@ -1372,8 +1433,8 @@
       <div class="card">
         <div class="card-header">
           <div class="card-icon ${ac==='black'?'gray':ac}">📋</div>
-          <div><div class="card-title">แผนดำเนินการ — Action Plan</div>
-          <div class="card-desc">ขั้นตอนที่แนะนำตาม Algorithm สำหรับ ${ctx.tag}</div></div>
+          <div><div class="card-title">ทำแบบนี้ได้เลย — ทีละขั้น</div>
+          <div class="card-desc">สิ่งที่ควรทำต่อจากนี้ตามสถานการณ์ของคุณ</div></div>
         </div>
         <div class="card-body">
           <ul class="action-list">${actionsHtml}</ul>
@@ -1382,46 +1443,63 @@
   }
 
   /* ──────────────────────────────────────────
-     Strategy Card (Context A only)
-     Avalanche vs Snowball
+     Payment Queue Card (Context A only)
+     Algorithm Phase 3: Quick Win → High Interest → Low Balance
+     Algorithm Phase 4 Node A: Zero Fragmentation
   ────────────────────────────────────────── */
   function renderStrategy(an) {
-    if (!an.avalancheTarget && !an.snowballTarget) return '';
+    if (!an.paymentQueue || an.paymentQueue.length === 0) return '';
 
-    const ava = an.avalancheTarget;
-    const sno = an.snowballTarget;
+    const target = an.paymentQueue[0];
+    const isQuickWin = an.NCF > 0 && target.balance <= an.NCF * 2;
+    const monthsEst  = an.NCF > 0 ? (target.balance / an.NCF).toFixed(1) : null;
 
-    // Recommend Avalanche if NCF is large enough to matter; Snowball if many small debts
-    const hasManyDebts   = an.sortedDebts.length > 3;
-    const recommend      = hasManyDebts ? 'snowball' : 'avalanche';
-
-    const avaCard = ava ? `
-      <div class="strategy-card ${recommend==='avalanche'?'recommended':''}">
-        ${recommend==='avalanche' ? '<span class="strategy-badge">แนะนำ</span>' : ''}
-        <div class="strategy-title">🏔️ Avalanche Method</div>
-        <div class="strategy-target">เป้าหมายถัดไป: <strong>${ava.creditor||DEBT_LABEL[ava.type]} (${ava.interest}%/ปี)</strong></div>
-        <div class="strategy-note">ชำระหนี้ดอกเบี้ยสูงสุดก่อน — ประหยัดดอกเบี้ยรวมได้มากที่สุดในระยะยาว แต่ใช้เวลาเห็นผลนานกว่า</div>
-      </div>` : '';
-
-    const snoCard = sno ? `
-      <div class="strategy-card ${recommend==='snowball'?'recommended':''}">
-        ${recommend==='snowball' ? '<span class="strategy-badge">แนะนำ</span>' : ''}
-        <div class="strategy-title">⛄ Snowball Method</div>
-        <div class="strategy-target">เป้าหมายถัดไป: <strong>${sno.creditor||DEBT_LABEL[sno.type]} (฿${fm(sno.balance)})</strong></div>
-        <div class="strategy-note">ชำระหนี้ยอดน้อยที่สุดก่อน — สร้างแรงจูงใจ ปิดหนี้ได้เร็ว แล้วโอน Min_Payment ไปก้อนถัดไป</div>
-      </div>` : '';
+    const queueRows = an.paymentQueue.map((debt, i) => {
+      const qw = an.NCF > 0 && debt.balance <= an.NCF * 2;
+      const mo = an.NCF > 0 ? (debt.balance / an.NCF).toFixed(1) : '—';
+      const label = i === 0
+        ? `<span class="pri-badge pri-0">🎯 เป้าหมาย</span>`
+        : `<span style="color:var(--gray-400); font-size:13px;">${i + 1}</span>`;
+      return `<tr class="${i === 0 ? 'pri-highlight-0' : ''}">
+        <td>${label}</td>
+        <td>${qw ? '<span style="color:var(--success);font-weight:500;">⚡ Quick Win — </span>' : ''}${DEBT_LABEL[debt.type]||debt.type}</td>
+        <td>${debt.creditor||'—'}</td>
+        <td class="amt">฿${fm(debt.balance)}</td>
+        <td class="amt">${debt.interest > 0 ? debt.interest + '%' : '—'}</td>
+        <td class="amt">${an.NCF > 0 ? '~' + mo + ' ด.' : '—'}</td>
+      </tr>`;
+    }).join('');
 
     return `
       <div class="card">
         <div class="card-header">
           <div class="card-icon green">🎯</div>
-          <div><div class="card-title">กลยุทธ์การชำระหนี้ — Context A Action 2</div>
-          <div class="card-desc">นำ NCF ฿${fm(an.NCF)}/เดือน โจมตีหนี้เป้าหมาย</div></div>
+          <div><div class="card-title">โปะก้อนนี้ก่อน — ทีละก้อน</div>
+          <div class="card-desc">เอาเงินที่เหลือ ฿${fm(an.NCF)}/เดือน โปะหนี้อันดับ 1 ก่อนเลย ห้ามแบ่งหลายก้อน</div></div>
         </div>
         <div class="card-body">
-          <div class="strategy-grid">${avaCard}${snoCard}</div>
-          <div style="margin-top:12px; padding:10px 14px; background:var(--primary-light); border-radius:var(--radius-sm); font-size:13px; color:var(--primary);">
-            💡 <strong>Debt Roll-over:</strong> เมื่อปิดหนี้ก้อนใดได้แล้ว ให้โอนยอด Min_Payment ของก้อนนั้นทั้งหมด ไปรวมกับ NCF แล้วโจมตีก้อนถัดไป วนซ้ำจนกว่า Debt Array จะว่างเปล่า
+          <div style="padding:14px 16px; background:var(--primary-light); border:2px solid var(--primary); border-radius:var(--radius-sm); margin-bottom:16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">
+              🎯 โปะก้อนนี้ก่อนเลย${isQuickWin ? ' — ⚡ ปิดได้เร็ว!' : ''}
+            </div>
+            <div style="font-size:20px; font-weight:600; color:var(--gray-900);">${target.creditor || (DEBT_LABEL[target.type]||target.type)}</div>
+            <div style="font-size:13px; color:var(--gray-500); margin-top:3px;">
+              ยอดที่ค้างอยู่ ฿${fm(target.balance)}
+              ${target.interest > 0 ? ' · ดอกเบี้ย ' + target.interest + '%/ปี' : ''}
+              ${monthsEst ? ' · ปิดได้ใน ~' + monthsEst + ' เดือน' : ''}
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>ลำดับ</th><th>ประเภทหนี้</th><th>เจ้าหนี้</th>
+                <th class="num">ยอดที่ค้างอยู่</th><th class="num">ดอกเบี้ย/ปี</th><th class="num">ปิดได้ใน</th>
+              </tr></thead>
+              <tbody>${queueRows}</tbody>
+            </table>
+          </div>
+          <div style="margin-top:14px; padding:10px 14px; background:var(--primary-light); border-radius:var(--radius-sm); font-size:13px; color:var(--primary);">
+            💡 <strong>วิธีใช้ตาราง:</strong> เริ่มจากอันดับ 1 ก่อนเลย พอปิดได้แล้ว เอาเงินผ่อนก้อนนั้นทั้งหมดบวกกับเงินที่เหลือ ไปโปะอันดับ 2 ต่อ วนแบบนี้ไปเรื่อยๆ จนหมดทุกก้อน
           </div>
         </div>
       </div>`;
@@ -1485,6 +1563,8 @@
     document.getElementById('sav-balance').value = '';
     document.getElementById('sav-monthly').value = '';
     document.getElementById('chk-collection').checked = false;
+    ['chk-err1','chk-err2','chk-err3'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
+    updateDiagnostic();
     document.getElementById('results-content').innerHTML = '';
     iCount = dCount = eCount = aCount = 0;
     addIncome(); addDebt(); addExpense();
@@ -1508,6 +1588,13 @@
   function fm(v) {
     if (isNaN(v)) return '0';
     return Math.abs(v).toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  /* ── Phase 0: Diagnostic UI update ── */
+  function updateDiagnostic() {
+    const hasError = ['chk-err1','chk-err2','chk-err3'].some(id => document.getElementById(id)?.checked);
+    const alert = document.getElementById('force-shield-alert');
+    if (alert) alert.style.display = hasError ? 'block' : 'none';
   }
 
   /* Init */
