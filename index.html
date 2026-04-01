@@ -828,13 +828,17 @@
 </main>
 
 <footer class="page-footer container">
-  HealthDebt &bull; ประมวลผลในเบราว์เซอร์ทั้งหมด ข้อมูลไม่ถูกส่งออกภายนอก
+  HealthDebt &bull; ข้อมูลที่กรอกจะถูกนำไปปรับปรุงระบบ ไม่มีการเปิดเผยต่อบุคคลภายนอก
 </footer>
+
 
 <!-- ═══════════════════════════════════════════════════════════
      SCRIPT — Debt Management Algorithm
 ═══════════════════════════════════════════════════════════ -->
 <script>
+  /* ── Google Sheets endpoint (set after deploying apps-script.gs as Web App) ── */
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWVd-5V4RBVAEgUTC2lKBxXavPbRVJ3dup16Dkz1oIAIxqdRM8rJTYnMtUGQ4ZXeU84g/exec';
+
   /* ── Splash screen ── */
   function dismissSplash() {
     const s = document.getElementById('splash');
@@ -1679,38 +1683,51 @@
     goStep(5);
   }
 
-  /* ── Admin: persist submission to localStorage ── */
+  /* ── Admin: persist submission to localStorage + Google Sheets ── */
   function saveSubmission(d, an) {
+    const payload = {
+      id:           'sess_' + Date.now(),
+      timestamp:    new Date().toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' }),
+      timestampISO: new Date().toISOString(),
+      data: d,
+      analysis: {
+        context:        an.context,
+        nodeD:          an.nodeD,
+        NCF:            an.NCF,
+        ncfPct:         an.ncfPct,
+        totalIncome:    an.totalIncome,
+        savMonthly:     an.savMonthly,
+        taxSS:          an.taxSS,
+        livingExp:      an.livingExp,
+        sumMinPayment:  an.sumMinPayment,
+        dtiPct:         an.dtiPct,
+        expPct:         an.expPct,
+        fixedEtiPct:    an.fixedEtiPct,
+        variableEtiPct: an.variableEtiPct,
+        signal2:        an.signal2,
+        totalDebtBal:   an.totalDebtBal,
+        totalAssetVal:  an.totalAssetVal,
+        emergencyFund:  an.emergencyFund,
+        netWorth:       an.netWorth,
+      },
+    };
+
+    // 1) LocalStorage (admin page)
     try {
       const list = JSON.parse(localStorage.getItem('hd_submissions') || '[]');
-      list.push({
-        id:        'sess_' + Date.now(),
-        timestamp: new Date().toLocaleString('th-TH', { dateStyle:'short', timeStyle:'short' }),
-        timestampISO: new Date().toISOString(),
-        data: d,
-        analysis: {
-          context:       an.context,
-          nodeD:         an.nodeD,
-          NCF:           an.NCF,
-          ncfPct:        an.ncfPct,
-          totalIncome:   an.totalIncome,
-          savMonthly:    an.savMonthly,
-          taxSS:         an.taxSS,
-          livingExp:     an.livingExp,
-          sumMinPayment: an.sumMinPayment,
-          dtiPct:        an.dtiPct,
-          expPct:        an.expPct,
-          fixedEtiPct:   an.fixedEtiPct,
-          variableEtiPct:an.variableEtiPct,
-          signal2:       an.signal2,
-          totalDebtBal:  an.totalDebtBal,
-          totalAssetVal: an.totalAssetVal,
-          emergencyFund: an.emergencyFund,
-          netWorth:      an.netWorth,
-        },
-      });
+      list.push(payload);
       localStorage.setItem('hd_submissions', JSON.stringify(list));
-    } catch(e) { /* localStorage unavailable — silently skip */ }
+    } catch(e) { /* unavailable — skip */ }
+
+    // 2) Google Sheets — silent background logging
+    if (APPS_SCRIPT_URL) {
+      fetch(APPS_SCRIPT_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body:    JSON.stringify(payload),
+      }).catch(() => { /* silent fail — log collection is best-effort */ });
+    }
   }
 
   function doEditData() {
