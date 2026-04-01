@@ -622,6 +622,29 @@
         </div>
       </div>
     </div>
+    <!-- Section A: Deductions (Savings + Tax & SS + Emergency Fund) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">💳</div>
+        <div><div class="card-title">หักออกจากรายได้ก่อนคำนวณ</div><div class="card-desc">เงินออม ภาษี และประกันสังคม — ระบบจะนำไปหักก่อนคำนวณกระแสเงินสด (NCF)</div></div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>เงินออมต่อเดือน <span class="opt">(฿/เดือน)</span></label>
+            <div class="input-wrap"><input type="text" inputmode="numeric" id="sav-monthly" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿/ด.</span></div>
+          </div>
+          <div class="form-group">
+            <label>ภาษี + ประกันสังคม <span class="opt">(฿/เดือน)</span></label>
+            <div class="input-wrap"><input type="text" inputmode="numeric" id="tax-ss" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿/ด.</span></div>
+          </div>
+          <div class="form-group">
+            <label>เงินสำรองฉุกเฉินที่มีอยู่ <span class="opt">(฿)</span></label>
+            <div class="input-wrap"><input type="text" inputmode="numeric" id="emergency-fund" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="nav-footer">
       <div></div>
       <button class="btn btn-primary" onclick="nextStep(1)">ถัดไป &rarr; กรอกหนี้</button>
@@ -647,25 +670,19 @@
           <div style="font-size:15px; font-weight:600; color:#b71c2c; margin-bottom:4px;">⚠️ สัญญาณอันตราย — ห้ามกู้เพิ่มอีกเด็ดขาด!</div>
           <div style="font-size:13px; color:#b71c2c; font-weight:300;">คุณกำลังอยู่ในวงจรที่ทำให้หนี้โตขึ้นเรื่อยๆ <strong>ห้ามกู้เงินใหม่ทุกรูปแบบ</strong> ไม่ว่าจะบัตรเครดิต บัตรกด หรือสินเชื่อใดก็ตาม ต้องหยุดก่อน แล้วทำตามแผนด้านล่าง</div>
         </div>
+        <div style="font-size:12px; color:var(--gray-500); margin-bottom:10px; font-weight:300;">⚡ สัญญาณที่ 2 (DTI ≥ 40%) จะตรวจจับอัตโนมัติจากข้อมูลที่กรอก</div>
         <label class="check-option" onclick="updateDiagnostic()">
           <input type="checkbox" id="chk-err1">
           <div>
-            <div class="check-option-text">ผ่อนมานานมากแล้ว แต่ยอดหนี้แทบไม่ลดเลย</div>
-            <div class="check-option-sub">จ่ายไปทุกเดือนแต่เหมือนดอกเบี้ยกินหมด ยอดต้นแทบไม่ขยับ</div>
-          </div>
-        </label>
-        <label class="check-option" onclick="updateDiagnostic()">
-          <input type="checkbox" id="chk-err2">
-          <div>
-            <div class="check-option-text">จ่ายค่างวดแล้ว กดเงินสดกลับมาใช้อีก</div>
-            <div class="check-option-sub">ใช้บัตรกดเงินสดหรือวงเงินบัตรเครดิตหมุนจ่ายค่างวดตัวเอง</div>
+            <div class="check-option-text">⚠️ สัญญาณที่ 1: ตอนนี้คุณจ่ายหนี้แค่ขั้นต่ำอยู่ไหม?</div>
+            <div class="check-option-sub">จ่ายแค่ขั้นต่ำทุกเดือน — ดอกเบี้ยกิน ยอดต้นแทบไม่ลด Minimum Payment = Maximum Pain</div>
           </div>
         </label>
         <label class="check-option" onclick="updateDiagnostic()">
           <input type="checkbox" id="chk-err3">
           <div>
-            <div class="check-option-text">เคยกู้เงินใหม่ หรือเปิดบัตรใหม่ เพื่อเอาไปจ่ายหนี้เก่า</div>
-            <div class="check-option-sub">กู้มาหมุน — เอาหนี้ใหม่มาจ่ายหนี้เก่า วนไปเรื่อยๆ</div>
+            <div class="check-option-text">🔴 สัญญาณที่ 3: เคยกู้เงินใหม่ หรือเปิดบัตรใหม่ เพื่อเอาไปจ่ายหนี้เก่าไหม?</div>
+            <div class="check-option-sub">วงจรขุดหลุมฝังตัวเอง — หนี้ใหม่มาจ่ายหนี้เก่า วนซ้ำ อันตรายที่สุด</div>
           </div>
         </label>
       </div>
@@ -753,26 +770,8 @@
   <!-- ═══ STEP 4 : ทรัพย์สิน (Optional) ═══ -->
   <div class="step-content" id="step-4">
     <div class="step-heading">
-      <h2>🏠 เงินออมและสิ่งที่มี <span class="opt-badge">ไม่บังคับ</span></h2>
-      <p>ถ้ามีเงินเก็บหรือทรัพย์สิน ใส่ได้เลย จะช่วยให้แผนแม่นขึ้น ถ้าไม่มีก็ข้ามได้</p>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon green">💰</div>
-        <div><div class="card-title">เงินสดและเงินออม</div><div class="card-desc">เงินในบัญชี เงินสดที่มีอยู่ และที่ออมได้ต่อเดือน</div></div>
-      </div>
-      <div class="card-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>เงินในบัญชีออมทรัพย์ / เงินสด <span class="opt">(฿)</span></label>
-            <div class="input-wrap"><input type="text" inputmode="numeric" id="sav-balance" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿</span></div>
-          </div>
-          <div class="form-group">
-            <label>เงินออมต่อเดือน <span class="opt">(฿/เดือน)</span></label>
-            <div class="input-wrap"><input type="text" inputmode="numeric" id="sav-monthly" placeholder="0" oninput="fmtComma(this)"><span class="input-unit">฿/ด.</span></div>
-          </div>
-        </div>
-      </div>
+      <h2>🏠 ทรัพย์สินที่มีอยู่ <span class="opt-badge">ไม่บังคับ</span></h2>
+      <p>ถ้ามีทรัพย์สิน ใส่ได้เลย จะช่วยให้แผนแม่นขึ้น ถ้าไม่มีก็ข้ามได้</p>
     </div>
     <div class="card">
       <div class="card-header">
@@ -1039,13 +1038,13 @@
 
     return {
       incomes, debts, expenses, assets,
-      savBalance: fnum2('sav-balance'),
-      savMonthly: fnum2('sav-monthly'),
+      savMonthly:    fnum2('sav-monthly'),
+      taxSS:         fnum2('tax-ss'),
+      emergencyFund: fnum2('emergency-fund'),
       inCollection: document.getElementById('chk-collection').checked,
       errors: {
-        minOnly:   !!document.getElementById('chk-err1')?.checked,
-        cashCycle: !!document.getElementById('chk-err2')?.checked,
-        newDebt:   !!document.getElementById('chk-err3')?.checked,
+        minOnly: !!document.getElementById('chk-err1')?.checked,
+        newDebt: !!document.getElementById('chk-err3')?.checked,
       },
     };
   }
@@ -1125,58 +1124,81 @@
     const totalIncome   = d.incomes.reduce((s,i) => s + i.amount, 0);
     const livingExp     = d.expenses.reduce((s,e) => s + e.amount, 0);  // Living_Expenses
     const sumMinPayment = d.debts.reduce((s,x) => s + x.monthly, 0);   // Sum(Min_Payment)
+    const fixedExp      = d.expenses.filter(e => e.type === 'fixed').reduce((s,e) => s + e.amount, 0);
+    const variableExp   = d.expenses.filter(e => e.type === 'variable').reduce((s,e) => s + e.amount, 0);
 
-    // [2] NCF
-    const NCF    = totalIncome - livingExp - sumMinPayment;
+    // [2] NCF — Phase 2: Liquidity Processing
+    // NCF = Total_Income − Savings − Tax & SS − Living_Expenses − Sum(Min_Payment)
+    const NCF    = totalIncome - d.savMonthly - d.taxSS - livingExp - sumMinPayment;
     const ncfPct = totalIncome > 0 ? (NCF / totalIncome) * 100 : (NCF < 0 ? -100 : 0);
     const dtiPct = totalIncome > 0 ? (sumMinPayment / totalIncome) * 100 : 0;
     const expPct = totalIncome > 0 ? (livingExp / totalIncome) * 100 : 0;
+    const fixedEtiPct    = totalIncome > 0 ? (fixedExp / totalIncome) * 100 : 0;
+    const variableEtiPct = totalIncome > 0 ? (variableExp / totalIncome) * 100 : 0;
+    const signal2 = dtiPct >= 40; // Fatal Error Signal 2: auto-detected
 
     // [3] Sort by Priority (0=Critical first) — used for the risk/urgency table
     const sortedDebts = [...d.debts].sort((a,b) => a.priority - b.priority);
 
     // Phase 0: System Diagnostic — Fatal Error detection
-    const forceShield = !!(d.errors && (d.errors.minOnly || d.errors.cashCycle || d.errors.newDebt));
+    const forceShield = !!(d.errors && (d.errors.minOnly || d.errors.newDebt));
 
-    // Phase 3: Advanced Debt Sorting Engine — Payment Queue
-    // Priority #1 (Critical Override): Quick Win — balance closeable in 1–2 months with NCF
+    // Phase 3: Advanced Debt Sorting Engine
     const activeDebts = d.debts.filter(x => x.balance > 0);
+
+    // Method 3B: Monthly NCF Payoff Queue (Quick Win → B÷M ratio → Balance tiebreak)
     const quickWinDebts = NCF > 0
       ? activeDebts.filter(x => x.balance <= NCF * 2).sort((a,b) => a.balance - b.balance)
       : [];
-    const quickWinIds = new Set(quickWinDebts.map((_, i) => quickWinDebts[i]));
-    // Priority #2 & #3: remaining debts — sort by highest interest first, then lowest balance
-    const restDebts = activeDebts
-      .filter(x => !(NCF > 0 && x.balance <= NCF * 2))
+    const quickWinSet = new Set(quickWinDebts);
+    const restDebts3B = activeDebts
+      .filter(x => !quickWinSet.has(x))
+      .sort((a,b) => {
+        const ratioA = a.monthly > 0 ? a.balance / a.monthly : Infinity;
+        const ratioB = b.monthly > 0 ? b.balance / b.monthly : Infinity;
+        if (ratioA !== ratioB) return ratioA - ratioB; // lower B÷M first
+        return a.balance - b.balance; // tiebreak: lower balance first
+      });
+    const paymentQueue = [...quickWinDebts, ...restDebts3B];
+
+    // Method 3A: Lump Sum Payoff Queue (Avalanche — highest interest first, skip flat-rate; tiebreak: lower balance)
+    const lumpSumQueue = [...activeDebts]
+      .filter(x => x.intType !== 'flat') // skip flat-rate debts
       .sort((a,b) => {
         if (b.interest !== a.interest) return b.interest - a.interest;
         return a.balance - b.balance;
       });
-    const paymentQueue = [...quickWinDebts, ...restDebts];
 
-    // [4] Context Routing
+    // Negative Amortization check: min_payment ≤ monthly interest → debt is growing
+    const negAmortDebts = activeDebts.filter(x => {
+      if (x.interest <= 0 || x.monthly <= 0) return false;
+      const monthlyInterest = x.balance * (x.interest / 100) / 12;
+      return x.monthly <= monthlyInterest;
+    });
+
+    // [4] Context Routing — Phase 4: Contextual Decision Tree
+    // NCF is the SOLE classifier. Node D is sub-path within Node C only.
     let context;
-    if (d.inCollection)            context = 'D';
-    else if (NCF > 0)              context = 'A';
-    else if (NCF >= -(totalIncome * 0.15)) context = 'B'; // ≈0 or slightly negative
-    else                           context = 'C'; // severely negative
+    if      (NCF > 0)                      context = 'A';
+    else if (NCF >= -(totalIncome * 0.15)) context = 'B'; // ≈0: Yellow
+    else                                   context = 'C'; // < 0: Red
+    const nodeD = context === 'C' && d.inCollection; // D only activates within C
 
     // Totals
     const totalDebtBal  = d.debts.reduce((s,x) => s + x.balance, 0);
     const totalAssetVal = d.assets.reduce((s,x) => s + x.value, 0);
-    const netWorth      = d.savBalance + totalAssetVal - totalDebtBal;
+    const netWorth      = d.emergencyFund + totalAssetVal - totalDebtBal;
 
-    // Haircut Fund estimate (Context C): money saved by stopping Priority 2 payments
-    const pri2Monthly   = d.debts.filter(x => x.priority === 2).reduce((s,x) => s + x.monthly, 0);
-
-    // Consolidation potential: check if high-interest debts can be merged
-    const hiInterestDebts = d.debts.filter(x => x.interest > 15 && x.priority >= 2);
+    // Unsecured monthly (for Node C stop-pay estimate)
+    const unsecuredMonthly = d.debts.filter(x => x.priority >= 2).reduce((s,x) => s + x.monthly, 0);
 
     return {
-      context, NCF, ncfPct, totalIncome, livingExp, sumMinPayment,
-      dtiPct, expPct, sortedDebts, paymentQueue, forceShield,
-      totalDebtBal, totalAssetVal, netWorth, pri2Monthly, hiInterestDebts,
-      savBalance: d.savBalance, savMonthly: d.savMonthly,
+      context, nodeD, NCF, ncfPct, totalIncome, livingExp, sumMinPayment,
+      dtiPct, expPct, fixedExp, variableExp, fixedEtiPct, variableEtiPct,
+      sortedDebts, paymentQueue, lumpSumQueue, negAmortDebts,
+      forceShield, signal2,
+      totalDebtBal, totalAssetVal, netWorth, unsecuredMonthly,
+      emergencyFund: d.emergencyFund, savMonthly: d.savMonthly, taxSS: d.taxSS,
     };
   }
 
@@ -1189,29 +1211,48 @@
   function renderResults(d, an) {
     let html = '';
 
-    /* ── NCF Summary Cards ── */
+    /* ── NCF Summary Cards (Financial Mirror) ── */
     const ncfColor = an.NCF > 0 ? 'pos' : an.NCF < 0 ? 'neg' : '';
+    const dtiColor = an.dtiPct >= 40 ? 'neg' : an.dtiPct >= 30 ? 'warn' : 'pos';
+    const deductTotal = an.savMonthly + an.taxSS;
     html += `
       <div class="ncf-box">
         <div class="ncf-card">
-          <div class="ncf-label">เงินเข้าต่อเดือน</div>
+          <div class="ncf-label">รายได้รวมต่อเดือน</div>
           <div class="ncf-value pos">฿${fm(an.totalIncome)}</div>
           <div class="ncf-sub">${d.incomes.length} แหล่งรายได้</div>
         </div>
         <div class="ncf-card">
-          <div class="ncf-label">ค่าใช้จ่ายประจำ</div>
-          <div class="ncf-value neg">฿${fm(an.livingExp)}</div>
-          <div class="ncf-sub">รายจ่ายต่อเดือน (ไม่รวมหนี้)</div>
+          <div class="ncf-label">หักออก (ออม + ภาษี/ประกัน)</div>
+          <div class="ncf-value neg">฿${fm(deductTotal)}</div>
+          <div class="ncf-sub">ออม ฿${fm(an.savMonthly)} · ภาษี/ประกัน ฿${fm(an.taxSS)}</div>
         </div>
         <div class="ncf-card">
-          <div class="ncf-label">ผ่อนหนี้ทุกก้อนรวม</div>
-          <div class="ncf-value neg">฿${fm(an.sumMinPayment)}</div>
-          <div class="ncf-sub">ยอดผ่อนขั้นต่ำต่อเดือน</div>
+          <div class="ncf-label">ค่าใช้จ่าย + ผ่อนหนี้</div>
+          <div class="ncf-value neg">฿${fm(an.livingExp + an.sumMinPayment)}</div>
+          <div class="ncf-sub">ใช้ชีวิต ฿${fm(an.livingExp)} · หนี้ ฿${fm(an.sumMinPayment)}</div>
         </div>
         <div class="ncf-card highlight">
-          <div class="ncf-label">= เงินคงเหลือต่อเดือน</div>
+          <div class="ncf-label">= NCF (กระแสเงินสดสุทธิ)</div>
           <div class="ncf-value ${ncfColor}">฿${fm(an.NCF)}</div>
           <div class="ncf-sub">${an.ncfPct >= 0 ? '+' : ''}${an.ncfPct.toFixed(1)}% ของรายได้</div>
+        </div>
+      </div>
+      <div class="ncf-box" style="grid-template-columns:repeat(3,1fr);">
+        <div class="ncf-card${an.signal2 ? ' highlight' : ''}">
+          <div class="ncf-label">DTI — ภาระหนี้ต่อรายได้</div>
+          <div class="ncf-value ${dtiColor}">${an.dtiPct.toFixed(1)}%</div>
+          <div class="ncf-sub">${an.signal2 ? '🔶 เกิน 40% — สัญญาณอันตราย 2' : 'เป้าหมาย: ต่ำกว่า 40%'}</div>
+        </div>
+        <div class="ncf-card">
+          <div class="ncf-label">ETI คงที่ — Fixed Expenses</div>
+          <div class="ncf-value">${an.fixedEtiPct.toFixed(1)}%</div>
+          <div class="ncf-sub">฿${fm(an.fixedExp)}/เดือน · ตัดยากในระยะสั้น</div>
+        </div>
+        <div class="ncf-card">
+          <div class="ncf-label">ETI แปรผัน — Variable Expenses</div>
+          <div class="ncf-value ${an.variableEtiPct > 30 ? 'warn' : ''}">${an.variableEtiPct.toFixed(1)}%</div>
+          <div class="ncf-sub">฿${fm(an.variableExp)}/เดือน · ตัดลดได้ทันที</div>
         </div>
       </div>`;
 
@@ -1231,28 +1272,34 @@
     html += renderContextBanner(an);
 
     /* ── Income Allocation Bar ── */
-    const expBar = Math.min(an.expPct, 100);
-    const dtiBar = Math.min(an.dtiPct, 100);
-    const ncfBar = Math.max(0, Math.min(an.ncfPct, 100));
-    const dtiCol = an.dtiPct > 50 ? 'red' : an.dtiPct > 35 ? 'orange' : 'blue';
+    const savPct  = an.totalIncome > 0 ? Math.min((an.savMonthly + an.taxSS) / an.totalIncome * 100, 100) : 0;
+    const expBar  = Math.min(an.expPct, 100);
+    const dtiBar  = Math.min(an.dtiPct, 100);
+    const ncfBar  = Math.max(0, Math.min(an.ncfPct, 100));
+    const dtiCol  = an.dtiPct >= 40 ? 'red' : an.dtiPct > 30 ? 'orange' : 'blue';
     html += `
       <div class="card">
         <div class="card-header">
           <div class="card-icon blue">📊</div>
-          <div><div class="card-title">เงินแต่ละเดือนของคุณไปไหนบ้าง?</div>
-          <div class="card-desc">รายได้ − รายจ่ายประจำ − ผ่อนหนี้ = เงินที่เหลือ</div></div>
+          <div><div class="card-title">กระจกส่องการเงิน — รายได้ไปไหนบ้าง?</div>
+          <div class="card-desc">รายได้ − หักออม/ภาษี − ค่าใช้จ่าย − ผ่อนหนี้ = NCF</div></div>
         </div>
         <div class="card-body">
+          ${savPct > 0 ? `
           <div class="pb-wrap">
-            <div class="pb-label"><span>ค่าใช้จ่ายประจำ</span><span>฿${fm(an.livingExp)} — ${expBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>ออม + ภาษี + ประกันสังคม</span><span>฿${fm(an.savMonthly + an.taxSS)} — ${savPct.toFixed(1)}%</span></div>
+            <div class="pb-track"><div class="pb-fill blue" style="width:${savPct}%"></div></div>
+          </div>` : ''}
+          <div class="pb-wrap">
+            <div class="pb-label"><span>ค่าใช้จ่ายประจำ (Fixed ฿${fm(an.fixedExp)} + Variable ฿${fm(an.variableExp)})</span><span>${expBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill orange" style="width:${expBar}%"></div></div>
           </div>
           <div class="pb-wrap">
-            <div class="pb-label"><span>ผ่อนหนี้ทุกก้อนรวม</span><span>฿${fm(an.sumMinPayment)} — ${dtiBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>ผ่อนหนี้ทุกก้อนรวม (DTI)${an.signal2 ? ' 🔶' : ''}</span><span>฿${fm(an.sumMinPayment)} — ${dtiBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill ${dtiCol}" style="width:${dtiBar}%"></div></div>
           </div>
           <div class="pb-wrap">
-            <div class="pb-label"><span>เงินที่เหลือต่อเดือน</span><span>฿${fm(Math.max(0,an.NCF))} — ${ncfBar.toFixed(1)}%</span></div>
+            <div class="pb-label"><span>NCF — กระแสเงินสดสุทธิที่เหลือ</span><span>฿${fm(Math.max(0,an.NCF))} — ${ncfBar.toFixed(1)}%</span></div>
             <div class="pb-track"><div class="pb-fill green" style="width:${ncfBar}%"></div></div>
           </div>
         </div>
@@ -1291,6 +1338,17 @@
         </div>`;
     }
 
+    /* ── Negative Amortization Warning ── */
+    if (an.negAmortDebts && an.negAmortDebts.length > 0) {
+      const negList = an.negAmortDebts.map(x => `<li style="font-size:13px; color:#b71c2c; padding:3px 0;">• <strong>${x.creditor || (DEBT_LABEL[x.type]||x.type)}</strong>: ยอดผ่อน ฿${fm(x.monthly)}/เดือน แต่ดอกเบี้ยสะสม ~฿${fm(Math.round(x.balance*(x.interest/100)/12))}/เดือน — หนี้กำลังเพิ่ม ไม่ใช่ลด</li>`).join('');
+      html += `
+        <div style="padding:14px 16px; background:var(--danger-bg); border:2px solid var(--danger); border-radius:var(--radius); margin-bottom:4px;">
+          <div style="font-size:15px; font-weight:600; color:#b71c2c; margin-bottom:6px;">⚠️ Negative Amortization — หนี้กำลังโตขึ้น!</div>
+          <div style="font-size:13px; color:#b71c2c; margin-bottom:8px; font-weight:300;">หนี้ก้อนด้านล่างนี้มียอดผ่อนต่ำกว่าดอกเบี้ยที่สะสมต่อเดือน หมายความว่ายอดหนี้กำลัง<strong>เพิ่มขึ้น</strong> ต้องเจรจาปรับเงื่อนไขทันที</div>
+          <ul style="list-style:none; padding:0;">${negList}</ul>
+        </div>`;
+    }
+
     /* ── Strategy (Context A only) ── */
     if (an.context === 'A' && d.debts.length > 0) {
       html += renderStrategy(an);
@@ -1322,8 +1380,8 @@
     }
 
     /* ── Net Worth ── */
-    if (d.savBalance > 0 || d.assets.length > 0 || an.totalDebtBal > 0) {
-      const totalA = d.savBalance + an.totalAssetVal;
+    if (d.emergencyFund > 0 || d.assets.length > 0 || an.totalDebtBal > 0) {
+      const totalA = d.emergencyFund + an.totalAssetVal;
       html += `
         <div class="card">
           <div class="card-header">
@@ -1336,7 +1394,7 @@
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">สิ่งที่มีทั้งหมด</div>
                 <div style="font-size:24px;font-weight:700;color:var(--success);">฿${fm(totalA)}</div>
-                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">เงินออม + สินทรัพย์อื่นๆ</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">เงินสำรองฉุกเฉิน + สินทรัพย์อื่นๆ</div>
               </div>
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px;">หนี้ที่ยังค้างอยู่</div>
@@ -1344,6 +1402,7 @@
                 <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">ยอดหนี้รวมทั้งหมด</div>
               </div>
             </div>
+            ${d.emergencyFund > 0 ? `<div style="font-size:12px; color:var(--gray-500); margin:8px 0 0; font-weight:300;">🛡️ เงินสำรองฉุกเฉิน ฿${fm(d.emergencyFund)} รวมอยู่ในสิ่งที่มีทั้งหมดแล้ว</div>` : ''}
             <div class="nw-row">
               <div class="nw-label">ทรัพย์สินสุทธิ</div>
               <div class="nw-value" style="color:${an.netWorth>=0?'var(--success)':'var(--danger)'};">
@@ -1359,64 +1418,102 @@
 
   /* ──────────────────────────────────────────
      Context Banner + Action Plan
+     Phase 4: Contextual Decision Tree — Node A / B / C (+ D sub-path)
   ────────────────────────────────────────── */
   function renderContextBanner(an) {
-    const ctx = {
+    const configs = {
       A: {
-        color:'green', emoji:'🟢', tag:'สถานะ: มีเงินเหลือ',
+        color:'green', emoji:'🟢', tag:'Node A — ผู้ป่วยทั่วไป (NCF > 0)',
         title:'ดีมาก! คุณยังมีเงินเหลือหลังจ่ายหนี้ทุกก้อน',
-        sub:'จ่ายขั้นต่ำได้ครบและยังมีเงินเหลือ ถึงเวลาเร่งปิดหนี้ได้เลย',
-        rule:'หัวใจสำคัญ: เงินที่เหลือทุกบาท โปะหนี้ก้อนเดียวก่อน ห้ามแบ่งหลายก้อน',
+        sub:'จ่ายขั้นต่ำได้ครบและยังมีเงินเหลือ ถึงเวลาเร่งปิดหนี้ด้วย ปลดหนี้ 5 ขั้นตอน',
+        rule:`หัวใจสำคัญ: เงิน NCF ฿${fm(an.NCF)}/เดือน โปะหนี้อันดับ 1 เพียงก้อนเดียว (Zero Fragmentation)`,
         actions: [
-          { t:'ขั้น 1: จ่ายขั้นต่ำทุกก้อนให้ครบทุกเดือน', d:'จ่ายยอดขั้นต่ำของหนี้ทุกรายการให้ตรงเวลา เพื่อรักษาประวัติการชำระ ห้ามข้ามแม้แต่ก้อนเดียว' },
-          { t:`ขั้น 2: เงินที่เหลือ ฿${fm(an.NCF)} ทุ่มโปะหนี้อันดับ 1 เพียงก้อนเดียว`, d:'เอาเงินที่เหลือทั้งหมดหลังจ่ายขั้นต่ำ ไปโปะหนี้ก้อนที่อยู่อันดับ 1 ในตารางด้านล่างเท่านั้น ห้ามแบ่งจ่ายหลายก้อนพร้อมกัน' },
-          { t:'ขั้น 3: พอปิดก้อนนั้นแล้ว เอาเงินทั้งหมดไปโปะก้อนถัดไป', d:'เมื่อหนี้ก้อนแรกหมดแล้ว เอาเงินก้อนนั้นทั้งหมดบวกกับเงินที่เหลือ ไปโปะหนี้ก้อนที่ 2 แล้ววนแบบนี้ไปเรื่อยๆ จนหมดหนี้' },
+          { t:'ขั้น 1: Force Shield — ห้ามสร้างหนี้ใหม่ทุกกรณี', d:'หยุดก่อหนี้จน! ห้ามกู้เงินใหม่ เปิดบัตรใหม่ หรือสร้างภาระใดๆ เพิ่มโดยเด็ดขาด เป็นกฎข้อแรกและสำคัญที่สุด' },
+          { t:'ขั้น 2: Fact Finding — ตรวจสอบหนี้คงค้างทั้งหมด', d:'ดูตารางลำดับหนี้ด้านล่าง ยืนยันยอดหนี้ ดอกเบี้ย และยอดผ่อนขั้นต่ำของทุกก้อน ให้ครบถ้วนก่อนเริ่มแผน' },
+          { t:'ขั้น 3: Lump Sum Attack — ถ้ามีเงินก้อน ใช้โปะดอกเบี้ยสูงสุดก่อน', d:'ถ้ามีโบนัส เงินสำรองเผื่อ หรือเงินก้อนพิเศษ ให้โปะหนี้ที่มีดอกเบี้ยสูงสุดก่อน (Avalanche) ห้ามแบ่งหลายก้อน และข้ามหนี้ดอกเบี้ยคงที่ (Flat Rate) ไว้ก่อน' },
+          { t:'ขั้น 4: Debt Consolidation — พิจารณารวมหนี้เฉพาะเมื่อคุ้ม', d:'ขอรวมหนี้ได้ เฉพาะเมื่อ: ดอกเบี้ยใหม่ < ดอกเบี้ยเดิม และ ยอดผ่อนต่อเดือนลดลง ⚠️ เมื่อปิดหนี้เก่าแล้ว ห้ามกลับไปใช้จ่ายแบบเดิม' },
+          { t:`ขั้น 5: NCF Snowball — เงินที่เหลือ ฿${fm(an.NCF)}/เดือน ทุ่มโปะอันดับ 1 เท่านั้น`, d:'จ่ายขั้นต่ำทุกก้อนให้ครบ แล้วเอา NCF ทั้งหมดโปะหนี้อันดับ 1 เพียงก้อนเดียว เมื่อปิดได้ ให้โยนเงินก้อนนั้นทั้งหมดต่อไปยังอันดับถัดไป (Cascade Effect)' },
         ],
       },
       B: {
-        color:'orange', emoji:'🟡', tag:'สถานะ: เงินเกือบไม่พอ',
-        title:'เริ่มตึงแล้ว เงินเกือบไม่พอจ่ายหนี้ทุกก้อน',
-        sub:'เดือนชนเดือน ต้องหาทางให้มีเงินเหลือก่อน แล้วค่อยเร่งปิดหนี้',
-        rule:'หัวใจสำคัญ: ลดรายจ่าย หารายได้เพิ่ม ลองขอรวมหนี้ แต่ห้ามกู้ใหม่เด็ดขาด',
+        color:'orange', emoji:'🟡', tag:'Node B — ปริ่มน้ำ / เดือนชนเดือน (NCF ≈ 0)',
+        title:'เริ่มตึงแล้ว! เงินเกือบไม่พอจ่ายหนี้ทุกก้อน',
+        sub:'สถานะปริ่มน้ำ — ต้องดัน NCF ให้เป็นบวกก่อน แล้วค่อยเปลี่ยนเป็น Node A',
+        rule:'หัวใจสำคัญ: ลดรายจ่ายแปรผัน + หารายได้เสริม (ไม่ใช่กู้เพิ่ม!) + พิจารณารวมหนี้',
         actions: [
-          { t:'ขั้น 1: ตัดรายจ่ายที่ไม่จำเป็นออกทันที และหาเงินเพิ่ม', d:'ดูค่าใช้จ่ายทีละรายการ และตัดที่ไม่จำเป็นออก เช่น ค่าบันเทิง ค่าสมาชิกต่างๆ พร้อมกันนี้ให้หางานพิเศษหรือขายของเพิ่มรายได้ เพื่อให้มีเงินเหลือหลังจ่ายหนี้' },
-          { t:'ขั้น 2: ลองขอรวมหนี้ทุกก้อนเป็นก้อนเดียวที่ผ่อนน้อยลง', d:'ติดต่อธนาคารหรือสถาบันการเงินเพื่อขอรวมหนี้ทั้งหมดเป็นสินเชื่อก้อนเดียว ยอดผ่อนต่อเดือนจะลดลง ทำให้มีเงินเหลือมากขึ้น' },
-          { t:'ขั้น 3: ห้ามกู้เงินใหม่มาจ่ายหนี้เก่าเด็ดขาด', d:'ระหว่างรอผล ห้ามเปิดบัตรใหม่ กู้เงินใหม่ หรือกดเงินสดมาหมุนจ่ายหนี้เก่า เพราะจะทำให้หนี้โตขึ้นเรื่อยๆ จนจ่ายไม่ไหว' },
-          { t:'✅ พอมีเงินเหลือแล้ว ทำตามแผนสถานะ "มีเงินเหลือ" ได้เลย', d:'เมื่อรวมหนี้สำเร็จหรือลดรายจ่ายได้จนมีเงินเหลือทุกเดือน ให้กลับมาทำตามขั้น 1–3 ของสถานะ "มีเงินเหลือ" ได้ทันที' },
+          { t:'ขั้น 1: Cost Reduction — หั่นค่าใช้จ่ายแปรผันที่ไม่จำเป็นออกทันที', d:'ดูรายการค่าใช้จ่ายแปรผัน (Variable) ในตารางด้านล่าง แล้วตัดที่ไม่จำเป็นออก เช่น ค่าบันเทิง สมาชิก ช้อปปิ้ง ค่าใช้จ่ายแปรผัน = ตัดได้เร็ว ไม่เหมือนค่าคงที่' },
+          { t:'ขั้น 2: Income Boost — หารายได้เสริมเพื่อดัน NCF ให้เป็นบวก', d:'หางานพิเศษ ฟรีแลนซ์ หรือขายของออนไลน์ ⚠️ หารายได้เพิ่ม ≠ กู้เงินเพิ่ม เป้าหมายคือดัน NCF ให้ติดบวกโดยไม่สร้างหนี้ใหม่' },
+          { t:'ขั้น 3: Debt Consolidation — ยื่นขอรวมหนี้เพื่อลดยอดผ่อนต่อเดือน', d:'นำรายการหนี้ทั้งหมดยื่นขอรวมหนี้กับสถาบันการเงิน เงื่อนไขเดิม: ดอกเบี้ยต้องต่ำลง + ยอดผ่อนต้องลดลง ระหว่างรอผลอนุมัติ ห้ามสร้างหนี้ใหม่เด็ดขาด' },
+          { t:'ขั้น 4: Strict Monitoring — ห้ามทำสัญญาณอันตราย 3 โดยเด็ดขาด', d:'ระหว่างนี้ห้ามกู้หนี้ใหม่ หรือเปิดบัตรใหม่มาหมุนจ่ายหนี้เก่า (สัญญาณที่ 3) นั่นคือการขุดหลุมฝังตัวเองให้ลึกขึ้น' },
+          { t:'✅ เมื่อ NCF กลับมาเป็นบวก → เปลี่ยนไปใช้แผน Node A ได้ทันที', d:'เมื่อรวมหนี้สำเร็จหรือรายได้เพิ่มขึ้นจน NCF ติดบวก ให้เริ่มใช้ ปลดหนี้ 5 ขั้นตอน ของ Node A เพื่อเร่งปิดหนี้' },
         ],
       },
       C: {
-        color:'red', emoji:'🔴', tag:'สถานะ: ยากมาก ขาดเงินหนัก',
-        title:'ตอนนี้หนักมาก เงินไม่พอจ่ายหนี้ทุกก้อน',
-        sub:'ต้องดูแลตัวเองให้อยู่รอดก่อน แล้วค่อยเจรจากับเจ้าหนี้ทีละขั้น',
+        color:'red', emoji:'🔴', tag:'Node C — ผู้ป่วยอาการโคม่า (NCF < 0)',
+        title:'ตอนนี้หนักมาก — รายได้ไม่พอจ่ายหนี้ทุกก้อน',
+        sub:'ปัญหาหนี้ทุกอย่างแก้ได้ แต่ต้องใช้เวลาและใช้ ยาแรง เรียงจากเบาไปหนัก',
         rule:'หัวใจสำคัญ: ชีวิตต้องอยู่ได้ก่อน อย่าเอาเงินสุดท้ายไปจ่ายหนี้จนตัวเองไม่มีกิน',
         actions: [
-          { t:'ขั้น 1: ถ้าจะใช้เงินเก็บ ห้ามเอาออกทั้งหมด', d:`ถ้าต้องเอาเงินเก็บ ฿${fm(an.savBalance)} มาใช้ ให้เอาได้ไม่เกินครึ่ง (ประมาณ ฿${fm(Math.round(an.savBalance * 0.45))}) เพื่อปิดหนี้ก้อนเล็กสุดก่อน เงินที่เหลืออีกครึ่งต้องเก็บไว้กินข้าว-ใช้ชีวิตต่อ ห้ามเอาออกหมดเด็ดขาด` },
-          { t:'ขั้น 2: โทรหาเจ้าหนี้ ขอผ่อนผันหรือยืดเวลา', d:'ติดต่อเจ้าหนี้แต่ละรายเพื่อขอ: จ่ายเฉพาะดอกก่อน, ขอลดดอกเบี้ย, ขอยืดเวลาผ่อน หรือขอหยุดพักชำระชั่วคราว เจ้าหนี้ส่วนใหญ่ยอมเจรจาถ้าเราโทรหาก่อน' },
-          { t:'ขั้น 3: ถ้าหนักมากจริงๆ ให้หยุดจ่ายบัตรเครดิตก่อน และเก็บเงินนั้นไว้', d:`ถ้าเจรจาไม่สำเร็จและไม่มีเงินกินข้าว ให้หยุดจ่ายบัตรเครดิตและบัตรกดเงินสดก่อน (ยังไม่ต้องหยุดจ่ายบ้านหรือรถ) เอาเงิน ฿${fm(an.pri2Monthly)}/เดือนที่ประหยัดได้ เก็บสะสมไว้เพื่อใช้ต่อรองปิดหนี้ในราคาลดในอนาคต` },
-          { t:'ขั้น 4: ใช้เงินที่เก็บสะสมไว้ต่อรองปิดหนี้ในราคาลด', d:'เมื่อเจ้าหนี้เสนอราคาพิเศษให้ปิดหนี้ครั้งเดียว ให้เอาเงินที่สะสมไว้ยื่นเจรจาปิดจบในราคาที่ต่ำกว่ายอดหนี้จริง' },
+          { t:'ยาแรง 1: หารายได้เพิ่ม — แต่ไม่ใช่กู้เพิ่ม', d:'หางานพิเศษ รับงานฟรีแลนซ์ ขายของ หรือขอเพิ่มชั่วโมงทำงาน ⚠️ หารายได้เพิ่ม ≠ กู้เงินเพิ่ม ถ้า NCF กลับมาบวกหรือใกล้ศูนย์ ให้เปลี่ยนไปใช้แผน Node A หรือ B' },
+          { t:'ยาแรง 2: เจรจาประนอมหนี้ — ติดต่อเจ้าหนี้ก่อนสาย', d:'ติดต่อเจ้าหนี้แต่ละรายทันทีเพื่อขอ: ลดดอกเบี้ย ยืดระยะเวลา ลดยอดผ่อน หรือพักชำระชั่วคราว อย่าปล่อยนานจนแก้ยาก เจ้าหนี้เจรจาได้ถ้าโทรหาก่อน' },
+          { t:'ยาแรง 3: ถอนเงินสะสม/เงินเกษียณ', d:'กองทุนสำรองเลี้ยงชีพ กองทุนรวม หุ้นสหกรณ์ — นำมาชำระหนี้โดยไม่ต้องกู้เพิ่ม ⚠️ Emergency Fund Rule: ถ้ามีเงินสำรอง ให้ใช้ไม่เกิน 40–50% เพื่อปิดหนี้ก้อนเล็กสุดก่อน เก็บที่เหลือไว้ใช้ชีวิต' },
+          { t:'ยาแรง 4: ขายสินทรัพย์ใหญ่ — บ้านหรือรถที่ไม่จำเป็น', d:'"ต้องจมให้เป็น" ทิ้งของหนักเพื่อให้เรือยังแล่นต่อได้ ถ้ารถหรือบ้านเป็นภาระเกินกว่ารายได้รองรับ การขายอาจช่วยให้หนี้ก้อนใหญ่หายไปและ NCF กลับมาเป็นบวก' },
+          { t:'ยาแรง 5: จำนองบ้านปลอดภาระ — Debt Consolidation ด้วยหลักประกัน', d:'ถ้ามีบ้านที่ปลอดภาระหรือมีส่วนเกิน สามารถนำมาค้ำเพื่อรวมหนี้ดอกสูงได้ เงื่อนไขเดิม: ดอกเบี้ยใหม่ต้องต่ำลง และยอดผ่อนต้องลดลง' },
+          { t:`ยาแรง 6: หยุดชำระหนี้ไม่มีหลักประกันชั่วคราว + สะสมเงิน`, d:`หยุดจ่ายหนี้ไม่มีหลักประกัน (บัตรเครดิต สินเชื่อส่วนบุคคล) ประมาณ ฿${fm(an.unsecuredMonthly)}/เดือน แล้วเก็บสะสมไว้เพื่อต่อรองปิดจบทีละรายการ ⚠️ ต้องรับสายเจ้าหนี้ทุกครั้ง แจ้งสถานะ NCF จริง` },
         ],
       },
-      D: {
-        color:'black', emoji:'⚫', tag:'สถานะ: ถูกทวงหนี้หรือโดนฟ้อง',
-        title:'ถูกทวงหนี้หรือได้รับหมายศาลแล้ว — ต้องจัดการทันที',
-        sub:'อย่าหนีสาย อย่าหนีศาล — ยิ่งร่วมมือเร็ว ยิ่งมีโอกาสต่อรองได้มากกว่า',
-        rule:'หัวใจสำคัญ: รับสายทุกครั้ง ไปศาลทุกนัด ขอไกล่เกลี่ยในชั้นศาล',
-        actions: [
-          { t:'ขั้น 1: รับสายเจ้าหนี้ทุกครั้ง อย่าหนีสาย', d:'บอกสถานการณ์จริงว่าตอนนี้มีเงินเหลือเท่าไรต่อเดือน การรับสายและพูดคุยจะทำให้เจ้าหนี้ยินดีเจรจาลดดอกเบี้ยหรือยืดเวลาได้ง่ายขึ้น ถ้าหนีสายจะยิ่งเสียโอกาสต่อรอง' },
-          { t:'ขั้น 2: ถ้าได้รับหมายศาล ต้องไปศาลทุกนัด', d:'ห้ามขาดนัดศาลเด็ดขาด เพราะถ้าไม่ไปศาล สิทธิ์ในการต่อสู้คดีและเจรจาจะหมดไปทันที และอาจถูกยึดทรัพย์สินโดยไม่มีโอกาสแก้ตัว' },
-          { t:`ขั้น 3: ใช้สิทธิ์ขอไกล่เกลี่ยในชั้นศาล`, d:`เมื่อไปศาล ขอใช้สิทธิ์ไกล่เกลี่ยต่อหน้าผู้พิพากษา เพื่อขอลดดอกเบี้ยผิดนัด และตกลงยอดผ่อนใหม่ที่คุณจ่ายได้จริง ตามเงินที่มีอยู่` },
-        ],
-      },
-    }[an.context];
+    };
 
-    const ac = ctx.color === 'green' ? 'green' : ctx.color === 'orange' ? 'orange' : ctx.color === 'red' ? 'red' : 'black';
+    const ctx = configs[an.context];
+    const ac  = an.context === 'A' ? 'green' : an.context === 'B' ? 'orange' : 'red';
 
-    let actionsHtml = ctx.actions.map((a,i) => `
+    // DTI ≥ 40% warning inside Node A
+    let dtiWarning = '';
+    if (an.context === 'A' && an.signal2) {
+      dtiWarning = `
+        <div style="margin-bottom:16px; padding:14px 16px; background:rgba(248,107,15,.08); border:2px solid var(--warning); border-radius:var(--radius-sm); display:flex; gap:12px; align-items:flex-start;">
+          <div style="font-size:22px; flex-shrink:0;">🔶</div>
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#9a3400; margin-bottom:3px;">สัญญาณอันตราย 2 — DTI เกิน 40%!</div>
+            <div style="font-size:13px; color:#b84800; font-weight:300;">ยอดผ่อนหนี้รวมของคุณคิดเป็น <strong>${an.dtiPct.toFixed(1)}%</strong> ของรายได้ เกินกว่า 40% หมายความว่าถ้ารายได้หยุดชะงักแม้แต่เดือนเดียว คุณจะเข้าสู่วิกฤต NCF ของคุณยังเป็นบวกอยู่ แต่ต้องระวังเป็นพิเศษ — ห้ามสร้างหนี้ใหม่เด็ดขาด</div>
+          </div>
+        </div>`;
+    }
+
+    const actionsHtml = ctx.actions.map((a,i) => `
       <li class="action-item ${ac}">
         <div class="action-num">${i+1}</div>
         <div class="action-text"><strong>${a.t}</strong><br>${a.d}</div>
       </li>`).join('');
+
+    // Node D sub-path (shown only within Node C + inCollection)
+    let nodeDHtml = '';
+    if (an.nodeD) {
+      const dActions = [
+        { t:'D-1: Communication — รับสายเจ้าหนี้ทุกครั้ง', d:'รับสายและแจ้งสถานะ NCF จริงทุกครั้ง การหนีสายทำให้เสียโอกาสเจรจายกเว้นดอกเบี้ยผิดนัด เจ้าหนี้ยินดีเจรจามากกว่าถ้าลูกหนี้ร่วมมือ' },
+        { t:'D-2: Mediation — ไปศาลทุกนัด ขอไกล่เกลี่ยต่อหน้าผู้พิพากษา', d:'เมื่อหมายศาลมาถึง ต้องไปทุกครั้ง ใช้สิทธิ์ขอไกล่เกลี่ยในชั้นศาลเพื่อตกลงยอดผ่อนชำระใหม่ที่สอดคล้องกับ NCF จริง ห้ามขาดนัดเด็ดขาด' },
+        { t:'D-3: BoT Referral — ติดต่อคลินิกแก้หนี้ ธปท.', d:'ธนาคารแห่งประเทศไทยมีโครงการ "คลินิกแก้หนี้" ที่ช่วยเจรจากับเจ้าหนี้หลายรายพร้อมกัน เหมาะสำหรับผู้ที่มีหนี้ไม่มีหลักประกันกับหลายสถาบัน' },
+      ];
+      nodeDHtml = `
+        <div class="card" style="border-color:#32324a; border-width:2px;">
+          <div class="card-header" style="background:#1e1e36;">
+            <div class="card-icon gray">⚫</div>
+            <div>
+              <div class="card-title" style="color:#f0f0f8;">Node D — กระบวนการทวงถามและชั้นศาล</div>
+              <div class="card-desc" style="color:#9494a8;">คุณกำลังถูกทวงหนี้หรือได้รับหมายศาล — ต้องดำเนินการเพิ่มเติมนอกจาก ยาแรง 6 ขั้น</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <ul class="action-list">
+              ${dActions.map((a,i) => `
+                <li class="action-item black">
+                  <div class="action-num" style="background:var(--gray-700);">${i+1}</div>
+                  <div class="action-text"><strong>${a.t}</strong><br>${a.d}</div>
+                </li>`).join('')}
+            </ul>
+          </div>
+        </div>`;
+    }
 
     return `
       <div class="ctx-banner ${ac}">
@@ -1430,76 +1527,109 @@
         </div>
         <div class="ctx-rule">📌 ${ctx.rule}</div>
       </div>
+      ${dtiWarning}
       <div class="card">
         <div class="card-header">
-          <div class="card-icon ${ac==='black'?'gray':ac}">📋</div>
-          <div><div class="card-title">ทำแบบนี้ได้เลย — ทีละขั้น</div>
-          <div class="card-desc">สิ่งที่ควรทำต่อจากนี้ตามสถานการณ์ของคุณ</div></div>
+          <div class="card-icon ${ac}">📋</div>
+          <div><div class="card-title">แผนปฏิบัติการ — ทีละขั้นตามสถานการณ์</div>
+          <div class="card-desc">ทำตามลำดับ เริ่มจากขั้น 1 ก่อนเสมอ</div></div>
         </div>
         <div class="card-body">
           <ul class="action-list">${actionsHtml}</ul>
         </div>
-      </div>`;
+      </div>
+      ${nodeDHtml}`;
   }
 
   /* ──────────────────────────────────────────
      Payment Queue Card (Context A only)
-     Algorithm Phase 3: Quick Win → High Interest → Low Balance
-     Algorithm Phase 4 Node A: Zero Fragmentation
+     Method 3A: Lump Sum — Avalanche (highest interest, skip flat-rate)
+     Method 3B: Monthly NCF — Quick Win → B÷M ratio → Balance tiebreak
+     Phase 4 Node A: Zero Fragmentation
   ────────────────────────────────────────── */
   function renderStrategy(an) {
     if (!an.paymentQueue || an.paymentQueue.length === 0) return '';
 
-    const target = an.paymentQueue[0];
-    const isQuickWin = an.NCF > 0 && target.balance <= an.NCF * 2;
-    const monthsEst  = an.NCF > 0 ? (target.balance / an.NCF).toFixed(1) : null;
+    const target3B = an.paymentQueue[0];
+    const isQuickWin = an.NCF > 0 && target3B.balance <= an.NCF * 2;
+    const monthsEst  = an.NCF > 0 && an.NCF > 0 ? Math.ceil(target3B.balance / an.NCF) : null;
 
-    const queueRows = an.paymentQueue.map((debt, i) => {
+    // Method 3B: Monthly NCF Queue rows
+    const queue3BRows = an.paymentQueue.map((debt, i) => {
       const qw = an.NCF > 0 && debt.balance <= an.NCF * 2;
-      const mo = an.NCF > 0 ? (debt.balance / an.NCF).toFixed(1) : '—';
+      const ratio = debt.monthly > 0 ? (debt.balance / debt.monthly).toFixed(1) : '—';
+      const moToClose = an.NCF > 0 ? Math.ceil(debt.balance / an.NCF) + ' ด.' : '—';
       const label = i === 0
-        ? `<span class="pri-badge pri-0">🎯 เป้าหมาย</span>`
+        ? `<span class="pri-badge pri-0">🎯 อันดับ 1</span>`
         : `<span style="color:var(--gray-400); font-size:13px;">${i + 1}</span>`;
       return `<tr class="${i === 0 ? 'pri-highlight-0' : ''}">
         <td>${label}</td>
-        <td>${qw ? '<span style="color:var(--success);font-weight:500;">⚡ Quick Win — </span>' : ''}${DEBT_LABEL[debt.type]||debt.type}</td>
-        <td>${debt.creditor||'—'}</td>
+        <td>${qw ? '<span style="color:var(--success);font-size:11px;font-weight:500;">⚡ Quick Win</span> ' : ''}${debt.creditor || (DEBT_LABEL[debt.type]||debt.type)}</td>
         <td class="amt">฿${fm(debt.balance)}</td>
-        <td class="amt">${debt.interest > 0 ? debt.interest + '%' : '—'}</td>
-        <td class="amt">${an.NCF > 0 ? '~' + mo + ' ด.' : '—'}</td>
+        <td class="amt">฿${fm(debt.monthly)}</td>
+        <td class="amt">${ratio}</td>
+        <td class="amt">${moToClose}</td>
       </tr>`;
     }).join('');
+
+    // Method 3A: Lump Sum Queue rows
+    let lumpSumHtml = '';
+    if (an.emergencyFund > 0 && an.lumpSumQueue && an.lumpSumQueue.length > 0) {
+      const ls3ARows = an.lumpSumQueue.map((debt, i) => `
+        <tr class="${i === 0 ? 'pri-highlight-1' : ''}">
+          <td>${i === 0 ? '<span class="pri-badge pri-1">🎯 โปะก่อน</span>' : i + 1}</td>
+          <td>${debt.creditor || (DEBT_LABEL[debt.type]||debt.type)}</td>
+          <td class="amt">฿${fm(debt.balance)}</td>
+          <td class="amt">${debt.interest > 0 ? debt.interest + '%' : '—'}</td>
+          <td><span class="badge badge-variable">ลดต้นลดดอก</span></td>
+        </tr>`).join('');
+      lumpSumHtml = `
+        <div style="margin-top:16px;">
+          <div style="font-size:13px; font-weight:500; color:var(--gray-700); margin-bottom:8px;">🏦 Method 3A: มีเงินสำรองฉุกเฉิน ฿${fm(an.emergencyFund)} — โปะดอกเบี้ยสูงสุดก่อน (Avalanche)</div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr>
+                <th>ลำดับ</th><th>เจ้าหนี้</th><th>ยอดคงค้าง</th><th>ดอกเบี้ย/ปี</th><th>ประเภทดอก</th>
+              </tr></thead>
+              <tbody>${ls3ARows}</tbody>
+            </table>
+          </div>
+          <div style="margin-top:8px; font-size:12px; color:var(--gray-500);">⚠️ ข้ามหนี้ดอกเบี้ยคงที่ (Flat Rate) เพราะจ่ายล่วงหน้าไม่ลดดอก · ห้ามแบ่งเงินก้อนโปะหลายก้อนพร้อมกัน (Zero Fragmentation)</div>
+        </div>`;
+    }
 
     return `
       <div class="card">
         <div class="card-header">
           <div class="card-icon green">🎯</div>
-          <div><div class="card-title">โปะก้อนนี้ก่อน — ทีละก้อน</div>
-          <div class="card-desc">เอาเงินที่เหลือ ฿${fm(an.NCF)}/เดือน โปะหนี้อันดับ 1 ก่อนเลย ห้ามแบ่งหลายก้อน</div></div>
+          <div><div class="card-title">ลำดับการโปะหนี้ — NCF Snowball Plan</div>
+          <div class="card-desc">Method 3B: เงินที่เหลือ ฿${fm(an.NCF)}/เดือน → โปะอันดับ 1 เท่านั้น (Zero Fragmentation)</div></div>
         </div>
         <div class="card-body">
           <div style="padding:14px 16px; background:var(--primary-light); border:2px solid var(--primary); border-radius:var(--radius-sm); margin-bottom:16px;">
             <div style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">
-              🎯 โปะก้อนนี้ก่อนเลย${isQuickWin ? ' — ⚡ ปิดได้เร็ว!' : ''}
+              🎯 โปะก้อนนี้ก่อนเลย${isQuickWin ? ' — ⚡ Quick Win!' : ''}
             </div>
-            <div style="font-size:20px; font-weight:600; color:var(--gray-900);">${target.creditor || (DEBT_LABEL[target.type]||target.type)}</div>
+            <div style="font-size:20px; font-weight:600; color:var(--gray-900);">${target3B.creditor || (DEBT_LABEL[target3B.type]||target3B.type)}</div>
             <div style="font-size:13px; color:var(--gray-500); margin-top:3px;">
-              ยอดที่ค้างอยู่ ฿${fm(target.balance)}
-              ${target.interest > 0 ? ' · ดอกเบี้ย ' + target.interest + '%/ปี' : ''}
+              ยอดคงค้าง ฿${fm(target3B.balance)}
+              ${target3B.interest > 0 ? ' · ดอกเบี้ย ' + target3B.interest + '%/ปี' : ''}
               ${monthsEst ? ' · ปิดได้ใน ~' + monthsEst + ' เดือน' : ''}
             </div>
           </div>
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th>ลำดับ</th><th>ประเภทหนี้</th><th>เจ้าหนี้</th>
-                <th class="num">ยอดที่ค้างอยู่</th><th class="num">ดอกเบี้ย/ปี</th><th class="num">ปิดได้ใน</th>
+                <th>ลำดับ</th><th>เจ้าหนี้</th>
+                <th class="amt">ยอดคงค้าง</th><th class="amt">ขั้นต่ำ/เดือน</th>
+                <th class="amt">B÷M</th><th class="amt">ปิดได้ใน</th>
               </tr></thead>
-              <tbody>${queueRows}</tbody>
+              <tbody>${queue3BRows}</tbody>
             </table>
           </div>
+          ${lumpSumHtml}
           <div style="margin-top:14px; padding:10px 14px; background:var(--primary-light); border-radius:var(--radius-sm); font-size:13px; color:var(--primary);">
-            💡 <strong>วิธีใช้ตาราง:</strong> เริ่มจากอันดับ 1 ก่อนเลย พอปิดได้แล้ว เอาเงินผ่อนก้อนนั้นทั้งหมดบวกกับเงินที่เหลือ ไปโปะอันดับ 2 ต่อ วนแบบนี้ไปเรื่อยๆ จนหมดทุกก้อน
+            💡 <strong>Cascade Effect:</strong> พอปิดอันดับ 1 แล้ว เอาเงินผ่อนก้อนนั้นทั้งหมดบวก NCF โปะอันดับ 2 วนไปเรื่อยๆ จนหมดทุกก้อน หนี้ถัดไปจะปิดเร็วขึ้นเรื่อยๆ
           </div>
         </div>
       </div>`;
@@ -1539,15 +1669,22 @@
         data: d,
         analysis: {
           context:       an.context,
+          nodeD:         an.nodeD,
           NCF:           an.NCF,
           ncfPct:        an.ncfPct,
           totalIncome:   an.totalIncome,
+          savMonthly:    an.savMonthly,
+          taxSS:         an.taxSS,
           livingExp:     an.livingExp,
           sumMinPayment: an.sumMinPayment,
           dtiPct:        an.dtiPct,
           expPct:        an.expPct,
+          fixedEtiPct:   an.fixedEtiPct,
+          variableEtiPct:an.variableEtiPct,
+          signal2:       an.signal2,
           totalDebtBal:  an.totalDebtBal,
           totalAssetVal: an.totalAssetVal,
+          emergencyFund: an.emergencyFund,
           netWorth:      an.netWorth,
         },
       });
@@ -1560,10 +1697,11 @@
     ['income-list','debt-list','expense-list','asset-list'].forEach(id => {
       document.getElementById(id).innerHTML = '';
     });
-    document.getElementById('sav-balance').value = '';
-    document.getElementById('sav-monthly').value = '';
+    ['sav-monthly','tax-ss','emergency-fund'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
     document.getElementById('chk-collection').checked = false;
-    ['chk-err1','chk-err2','chk-err3'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
+    ['chk-err1','chk-err3'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
     updateDiagnostic();
     document.getElementById('results-content').innerHTML = '';
     iCount = dCount = eCount = aCount = 0;
@@ -1592,7 +1730,7 @@
 
   /* ── Phase 0: Diagnostic UI update ── */
   function updateDiagnostic() {
-    const hasError = ['chk-err1','chk-err2','chk-err3'].some(id => document.getElementById(id)?.checked);
+    const hasError = ['chk-err1','chk-err3'].some(id => document.getElementById(id)?.checked);
     const alert = document.getElementById('force-shield-alert');
     if (alert) alert.style.display = hasError ? 'block' : 'none';
   }

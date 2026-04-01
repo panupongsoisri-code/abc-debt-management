@@ -261,10 +261,11 @@
       const an = s.analysis;
       const ncfCls = an.NCF >= 0 ? 'pos' : 'neg';
       const ctxCls = `ctx-${an.context.toLowerCase()}`;
+      const nodeLabel = `Node ${an.context}${an.nodeD ? '+D' : ''}`;
       return `<tr>
         <td>${i+1}</td>
         <td>${s.timestamp}</td>
-        <td><span class="ctx-badge ${ctxCls}">Context ${an.context}</span></td>
+        <td><span class="ctx-badge ${ctxCls}">${nodeLabel}</span></td>
         <td class="num">฿${fmt(an.totalIncome)}</td>
         <td class="num">฿${fmt(an.livingExp)}</td>
         <td class="num">฿${fmt(an.sumMinPayment)}</td>
@@ -283,17 +284,19 @@
 
     /* ── Sheet 1: Summary ── */
     const summaryData = [
-      ['#','วันที่-เวลา','Session ID','Context','NCF (฿)','รายได้รวม (฿)','ค่าใช้จ่าย (฿)','ยอดผ่อนหนี้/ด. (฿)','DTI%','NCF%','หนี้รวม (฿)','ทรัพย์สินรวม (฿)','ทรัพย์สินสุทธิ (฿)','เงินออมปัจจุบัน (฿)','ออมเพิ่ม/เดือน (฿)','ถูกติดตามหนี้'],
+      ['#','วันที่-เวลา','Session ID','Node','NCF (฿)','รายได้รวม (฿)','ออม/เดือน (฿)','ภาษี+ประกัน (฿)','ค่าใช้จ่าย (฿)','ยอดผ่อนหนี้/ด. (฿)','DTI%','NCF%','Fixed ETI%','Variable ETI%','สัญญาณ 2 (DTI≥40%)','หนี้รวม (฿)','ทรัพย์สินรวม (฿)','เงินสำรองฉุกเฉิน (฿)','ทรัพย์สินสุทธิ (฿)','ถูกติดตามหนี้'],
     ];
     submissions.forEach((s, i) => {
       const an = s.analysis;
       summaryData.push([
         i+1, s.timestamp, s.id,
-        'Context ' + an.context,
-        an.NCF, an.totalIncome, an.livingExp, an.sumMinPayment,
+        `Node ${an.context}${an.nodeD ? '+D' : ''}`,
+        an.NCF, an.totalIncome, an.savMonthly||0, an.taxSS||0,
+        an.livingExp, an.sumMinPayment,
         +(+an.dtiPct||0).toFixed(1), +(+an.ncfPct||0).toFixed(1),
-        an.totalDebtBal, an.totalAssetVal, an.netWorth,
-        s.data.savBalance||0, s.data.savMonthly||0,
+        +(+an.fixedEtiPct||0).toFixed(1), +(+an.variableEtiPct||0).toFixed(1),
+        an.signal2 ? 'ใช่' : 'ไม่',
+        an.totalDebtBal, an.totalAssetVal, an.emergencyFund||0, an.netWorth,
         s.data.inCollection ? 'ใช่' : 'ไม่',
       ]);
     });
